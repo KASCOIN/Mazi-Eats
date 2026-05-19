@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Builder - MAZI-EATS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container container">
+            <a href="/" class="logo">🍽️ MAZI-EATS</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/">Home</a></li>
+                <li><a href="/recipe-builder" class="active">Recipe Builder</a></li>
+                <li><a href="/map">Find Food</a></li>
+                <li><a href="/healthy">Healthy on Budget</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" style="min-height: 40vh;">
+        <div class="container hero-content">
+            <h1>Recipe Builder</h1>
+            <p class="hero-subtitle">Create your perfect meal step by step with AI assistance</p>
+        </div>
+    </header>
+
+    <!-- Recipe Builder Form -->
+    <main class="container" style="padding: clamp(2rem, 5vw, 4rem) 0;">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <!-- Back Button (Mobile) -->
+            <button class="back-button" id="backButton" onclick="history.back()" style="display: none;">
+                ← Back
+            </button>
+
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" id="step-1">
+                    <div class="step-number">1</div>
+                    <span class="step-label">Base</span>
+                </div>
+                <div class="step" id="step-2">
+                    <div class="step-number">2</div>
+                    <span class="step-label">Style</span>
+                </div>
+                <div class="step" id="step-3">
+                    <div class="step-number">3</div>
+                    <span class="step-label">Servings</span>
+                </div>
+                <div class="step" id="step-4">
+                    <div class="step-number">4</div>
+                    <span class="step-label">Ingredients</span>
+                </div>
+                <div class="step" id="step-5">
+                    <div class="step-number">5</div>
+                    <span class="step-label">Preferences</span>
+                </div>
+                <div class="step" id="step-6">
+                    <div class="step-number">6</div>
+                    <span class="step-label">Recipe</span>
+                </div>
+            </div>
+
+            <!-- Form Sections -->
+            <form id="recipeForm">
+                <!-- Step 1: Base Food -->
+                <div class="card step-section" id="step-1-section">
+                    <h3>Step 1: Pick a Base Food</h3>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">Select what foundation you want for your meal</p>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="radio" id="base-rice" name="baseFood" value="Rice" required>
+                            <label for="base-rice" class="chip-label">🍚 Rice</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="radio" id="base-pasta" name="baseFood" value="Pasta">
+                            <label for="base-pasta" class="chip-label">🍝 Pasta</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="radio" id="base-yam" name="baseFood" value="Yam">
+                            <label for="base-yam" class="chip-label">🥔 Yam</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="radio" id="base-plantain" name="baseFood" value="Plantain">
+                            <label for="base-plantain" class="chip-label">🍌 Plantain</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="radio" id="base-beans" name="baseFood" value="Beans">
+                            <label for="base-beans" class="chip-label">🫘 Beans</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="radio" id="base-bread" name="baseFood" value="Bread">
+                            <label for="base-bread" class="chip-label">🍞 Bread</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="radio" id="base-noodles" name="baseFood" value="Noodles">
+                            <label for="base-noodles" class="chip-label">🍜 Noodles</label>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+                        <button type="button" class="btn btn-primary" onclick="goToStep(2)">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Style (Dynamic) -->
+                <div class="card step-section" id="step-2-section" style="display: none;">
+                    <h3>Step 2: Pick a Style</h3>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">How would you like to prepare your meal?</p>
+                    <div class="checkbox-group" id="styleOptions">
+                        <!-- Options will be populated dynamically -->
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+                        <button type="button" class="btn btn-ghost" onclick="goToStep(1)">← Back</button>
+                        <button type="button" class="btn btn-primary" onclick="goToStep(3)">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Servings -->
+                <div class="card step-section" id="step-3-section" style="display: none;">
+                    <h3>Step 3: Number of Servings</h3>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">How many portions do you need?</p>
+                    <div class="form-group">
+                        <label for="servings">Select servings:</label>
+                        <input type="number" id="servings" name="servings" min="1" max="10" value="1" required>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+                        <button type="button" class="btn btn-ghost" onclick="goToStep(2)">← Back</button>
+                        <button type="button" class="btn btn-primary" onclick="goToStep(4)">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Ingredient Selection Mode + Proteins -->
+                <div class="card step-section" id="step-4-section" style="display: none;">
+                    <h3>Step 4: Choose Your Ingredients</h3>
+                    
+                    <!-- Ingredient Mode Selection -->
+                    <div style="margin-bottom: 2rem;">
+                        <p style="color: var(--text-light); margin-bottom: 1rem;">How would you like to select ingredients?</p>
+                        <div class="checkbox-group" style="margin-bottom: 1.5rem;">
+                            <div class="checkbox-item">
+                                <input type="radio" id="ingredient-mode-suggested" name="ingredientMode" value="suggested" checked>
+                                <label for="ingredient-mode-suggested" class="chip-label">✓ Use Suggested Proteins</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="ingredient-mode-custom" name="ingredientMode" value="custom">
+                                <label for="ingredient-mode-custom" class="chip-label">✏️ Type Your Own</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggested Proteins (Shown when mode = suggested) -->
+                    <div id="suggestedProteinsSection">
+                        <p style="color: var(--text-light); margin-bottom: 1rem;">Pick one or more proteins (optional)</p>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="protein-chicken" name="proteins" value="Chicken">
+                                <label for="protein-chicken" class="chip-label">🍗 Chicken</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="protein-beef" name="proteins" value="Beef">
+                                <label for="protein-beef" class="chip-label">🥩 Beef</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="protein-fish" name="proteins" value="Fish">
+                                <label for="protein-fish" class="chip-label">🐟 Fish</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="protein-egg" name="proteins" value="Egg">
+                                <label for="protein-egg" class="chip-label">🥚 Egg</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="protein-tofu" name="proteins" value="Tofu">
+                                <label for="protein-tofu" class="chip-label">🔲 Tofu</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="protein-mackerel" name="proteins" value="Mackerel">
+                                <label for="protein-mackerel" class="chip-label">🐟 Mackerel</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="protein-sardine" name="proteins" value="Sardine">
+                                <label for="protein-sardine" class="chip-label">🥫 Sardine</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="protein-none" name="proteins" value="None">
+                                <label for="protein-none" class="chip-label">✓ None</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Ingredients (Hidden by default) -->
+                    <div id="customIngredientsSection" style="display: none;">
+                        <p style="color: var(--text-light); margin-bottom: 1rem;">Type the proteins/ingredients you want to include</p>
+                        <div class="form-group">
+                            <input type="text" id="customProteins" name="customProteins" placeholder="e.g., Shrimp, Okra, Spinach, Mushrooms..." style="width: 100%; padding: 0.75rem; border: 2px solid var(--primary-color); border-radius: 8px; font-size: 1rem;">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+                        <button type="button" class="btn btn-ghost" onclick="goToStep(3)">← Back</button>
+                        <button type="button" class="btn btn-primary" onclick="goToStep(5)">Next →</button>
+                    </div>
+                </div>
+
+                <!-- Step 5: User Preferences -->
+                <div class="card step-section" id="step-5-section" style="display: none;">
+                    <h3>Step 5: Your Preferences (Optional)</h3>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">Tell us about your preferences - dietary restrictions, allergies, equipment, spice level, etc.</p>
+                    <div class="form-group">
+                        <textarea id="userPreferences" name="userPreferences" placeholder="e.g., No fish, prefer spicy food, vegetarian, don't have blender, limited to 30 mins cooking time, nut allergies..." style="width: 100%; padding: 0.75rem; border: 2px solid var(--primary-color); border-radius: 8px; font-size: 1rem; min-height: 100px; font-family: inherit; resize: vertical;"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+                        <button type="button" class="btn btn-ghost" onclick="goToStep(4)">← Back</button>
+                        <button type="button" class="btn btn-primary" onclick="generateRecipe()">Generate Recipe →</button>
+                    </div>
+                </div>
+
+                <!-- Step 6: Generated Recipe -->
+                <div class="card step-section" id="step-6-section" style="display: none;">
+                    <div id="recipeOutput"></div>
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-ghost" onclick="resetForm()">← Start Over</button>
+                        <button type="button" class="btn btn-primary" onclick="window.print()">🖨️ Print Recipe</button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div class="card" id="loadingState" style="display: none; text-align: center;">
+                    <div class="loading">
+                        <span class="loading-spinner"></span>
+                        <span>Generating your recipe with AI...</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h4>About MAZI-EATS</h4>
+                    <p>Smart meal planning for Unilag students. Plan meals, find vendors, and eat healthy on a budget.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/recipe-builder">Recipe Builder</a></li>
+                        <li><a href="/map">Find Food</a></li>
+                        <li><a href="/healthy">Budget Meals</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li>Email: info@mazi-eats.com</li>
+                        <li>Campus: University of Lagos</li>
+                        <li>Akoka, Yaba</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 MAZI-EATS. All rights reserved.</p>
+                <p>Made for <span class="footer-built">Unilag Students</span> with ❤️</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">↑</button>
+
+    <!-- Navigation Scripts -->
+    <script>
+        // Hamburger Menu Toggle (Click Only - No Swipe)
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        if (hamburger) {
+            // Only handle direct clicks
+            hamburger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                }
+            });
+        }
+
+        // Scroll to Top Button
+        const scrollToTop = document.getElementById('scrollToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollToTop.classList.add('show');
+            } else {
+                scrollToTop.classList.remove('show');
+            }
+        });
+
+        scrollToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Active nav link highlighting
+        function updateActiveNavLink() {
+            const currentPage = window.location.pathname;
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage || (currentPage === '/recipe-builder' && href === '/recipe-builder')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        updateActiveNavLink();
+
+        // Show back button on mobile for recipe steps
+        function updateBackButton() {
+            const backButton = document.getElementById('backButton');
+            if (backButton) {
+                backButton.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+            }
+        }
+        updateBackButton();
+        window.addEventListener('resize', updateBackButton);
+    </script>
+
+    <script src="/js/recipe.js"></script>
+</body>
+</html>

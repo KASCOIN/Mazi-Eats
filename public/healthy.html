@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthy on Budget - MAZI-EATS</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container container">
+            <a href="/" class="logo">🍽️ MAZI-EATS</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/">Home</a></li>
+                <li><a href="/recipe-builder">Recipe Builder</a></li>
+                <li><a href="/map">Find Food</a></li>
+                <li><a href="/healthy" class="active">Healthy on Budget</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" style="min-height: 40vh;">
+        <div class="container hero-content">
+            <h1>Healthy Eating on Budget</h1>
+            <p class="hero-subtitle">Get smart meal ideas based on ingredients and budget</p>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="container" style="padding: clamp(2rem, 5vw, 4rem) 0;">
+        <div style="max-width: 700px; margin: 0 auto;">
+            <div class="card">
+                <h3 style="margin-bottom: 1.5rem; color: var(--primary);">💡 Smart Budget Meal Advisor</h3>
+                <p style="color: var(--text-light); margin-bottom: 2rem;">Share the ingredients you have and your budget. Our AI will suggest 3 nutritious meals you can make right now.</p>
+
+                <form id="healthyForm">
+                    <div class="form-group">
+                        <label for="ingredients">What foodstuff do you have?</label>
+                        <textarea 
+                            id="ingredients" 
+                            name="ingredients" 
+                            rows="5" 
+                            placeholder="e.g., Rice, eggs, tomatoes, onions, garlic, palm oil, salt, pepper..."
+                            required
+                            aria-label="List your available ingredients"
+                        ></textarea>
+                        <small style="color: var(--text-light); display: block; margin-top: 0.75rem;">✓ List all ingredients you have at home</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="budget">Your Budget</label>
+                        <div style="position: relative;">
+                            <span class="currency-prefix">₦</span>
+                            <input 
+                                type="number" 
+                                id="budget" 
+                                name="budget" 
+                                min="100" 
+                                max="50000" 
+                                step="100"
+                                placeholder="Enter amount (e.g., 1000)"
+                                value="1000"
+                                required
+                                style="padding-left: 2.5rem;"
+                                aria-label="Enter your budget in Naira"
+                            >
+                        </div>
+                        <small style="color: var(--text-light); display: block; margin-top: 0.75rem;">✓ How much money do you have?</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; min-height: 48px; font-weight: 600;">
+                        <span id="btnText">Get Meal Suggestions</span>
+                        <span id="btnSpinner" style="display: none;"></span>
+                    </button>
+                </form>
+
+                <!-- Loading State -->
+                <div id="loadingState" style="display: none; text-align: center; margin-top: 2rem;">
+                    <div class="loading">
+                        <span class="loading-spinner"></span>
+                        <span>Finding perfect meals for you...</span>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" style="display: none; margin-top: clamp(2rem, 5vw, 3rem);">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
+                        <span style="font-size: 1.5rem;">✨</span>
+                        <h3 style="margin: 0; color: var(--primary);">Your Personalized Suggestions</h3>
+                    </div>
+                    <div id="mealsContainer" class="meal-grid"></div>
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button type="button" class="btn btn-ghost" onclick="document.getElementById('healthyForm').reset(); document.getElementById('resultsSection').style.display = 'none';">← Try Again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h4>About MAZI-EATS</h4>
+                    <p>Smart meal planning for Unilag students. Plan meals, find vendors, and eat healthy on a budget.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/recipe-builder">Recipe Builder</a></li>
+                        <li><a href="/map">Find Food</a></li>
+                        <li><a href="/healthy">Budget Meals</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li>Email: info@mazi-eats.com</li>
+                        <li>Campus: University of Lagos</li>
+                        <li>Akoka, Yaba</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 MAZI-EATS. All rights reserved.</p>
+                <p>Made for <span class="footer-built">Unilag Students</span> with ❤️</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">↑</button>
+
+    <!-- Navigation Scripts -->
+    <script>
+        // Hamburger Menu Toggle (Click Only - No Swipe)
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        if (hamburger) {
+            hamburger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                }
+            });
+        }
+
+        // Active nav link highlighting
+        function updateActiveNavLink() {
+            const currentPage = window.location.pathname;
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage || (currentPage === '/healthy' && href === '/healthy')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        updateActiveNavLink();
+
+        const scrollToTop = document.getElementById('scrollToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollToTop.classList.add('show');
+            } else {
+                scrollToTop.classList.remove('show');
+            }
+        });
+
+        scrollToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+
+    <script src="/js/healthy.js"></script>
+</body>
+</html>
