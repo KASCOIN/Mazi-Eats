@@ -7,6 +7,28 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+    <!-- Navigation hamburger menu -->
+    <button class="nav-hamburger" id="navToggle" title="Menu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+    </button>
+
+    <!-- Navigation drawer -->
+    <nav class="nav-drawer" id="navDrawer">
+        <div class="nav-drawer-content">
+            <div class="nav-drawer-links">
+                <a href="/" class="nav-drawer-link"><em>🏠</em> Home</a>
+                <a href="/recipe-builder" class="nav-drawer-link"><em>👨‍🍳</em> Recipe Builder</a>
+                <a href="/map" class="nav-drawer-link"><em>🗺️</em> Campus Map</a>
+                <a href="/healthy" class="nav-drawer-link active"><em>💪</em> Budget Meals</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Navigation overlay -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
     <!-- Navigation -->
     <nav>
         <div class="nav-container container">
@@ -147,26 +169,26 @@
     <script>
         // Hamburger Menu Toggle (Click Only - No Swipe)
         const hamburger = document.getElementById('hamburger');
-        const navLinks = document.getElementById('navLinks');
+        const navLinksElement = document.getElementById('navLinks');
 
         if (hamburger) {
             hamburger.addEventListener('click', (e) => {
                 e.stopPropagation();
                 hamburger.classList.toggle('active');
-                navLinks.classList.toggle('active');
+                navLinksElement.classList.toggle('active');
             });
 
             document.querySelectorAll('.nav-links a').forEach(link => {
                 link.addEventListener('click', () => {
                     hamburger.classList.remove('active');
-                    navLinks.classList.remove('active');
+                    navLinksElement.classList.remove('active');
                 });
             });
 
             document.addEventListener('click', (e) => {
-                if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                if (!hamburger.contains(e.target) && !navLinksElement.contains(e.target)) {
                     hamburger.classList.remove('active');
-                    navLinks.classList.remove('active');
+                    navLinksElement.classList.remove('active');
                 }
             });
         }
@@ -197,6 +219,58 @@
         scrollToTop.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+
+        // Hamburger menu drawer functionality
+        const navToggle = document.getElementById('navToggle');
+        const navDrawer = document.getElementById('navDrawer');
+        const navOverlay = document.getElementById('navOverlay');
+        const navDrawerLinks = document.querySelectorAll('.nav-drawer-link');
+
+        // Toggle menu
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('active');
+            navDrawer.classList.toggle('open');
+            navOverlay.classList.toggle('show');
+        });
+
+        // Close menu on overlay click
+        navOverlay.addEventListener('click', () => {
+            navToggle.classList.remove('active');
+            navDrawer.classList.remove('open');
+            navOverlay.classList.remove('show');
+        });
+
+        // Close menu on link click
+        navDrawerLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                navDrawer.classList.remove('open');
+                navOverlay.classList.remove('show');
+            });
+        });
+
+        // Close menu on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                navToggle.classList.remove('active');
+                navDrawer.classList.remove('open');
+                navOverlay.classList.remove('show');
+            }
+        });
+
+        // Update drawer active link
+        function updateDrawerActiveLink() {
+            const currentPage = window.location.pathname;
+            document.querySelectorAll('.nav-drawer-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage || (currentPage === '/healthy' && href === '/healthy')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        updateDrawerActiveLink();
     </script>
 
     <script src="/js/healthy.js"></script>

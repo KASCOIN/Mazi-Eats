@@ -7,6 +7,28 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+    <!-- Navigation hamburger menu -->
+    <button class="nav-hamburger" id="navToggle" title="Menu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+    </button>
+
+    <!-- Navigation drawer -->
+    <nav class="nav-drawer" id="navDrawer">
+        <div class="nav-drawer-content">
+            <div class="nav-drawer-links">
+                <a href="/" class="nav-drawer-link active"><em>🏠</em> Home</a>
+                <a href="/recipe-builder" class="nav-drawer-link"><em>👨‍🍳</em> Recipe Builder</a>
+                <a href="/map" class="nav-drawer-link"><em>🗺️</em> Campus Map</a>
+                <a href="/healthy" class="nav-drawer-link"><em>💪</em> Budget Meals</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Navigation overlay -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
     <!-- Navigation -->
     <nav>
         <div class="nav-container container">
@@ -32,11 +54,12 @@
         <div class="hero-emoji">🍲</div>
         <div class="hero-emoji">🥘</div>
         <div class="container hero-content">
-            <h1>Eat Smart. Eat Well. Eat Unilag.</h1>
-            <p class="hero-tagline">Your AI-powered meal planning companion</p>
+            <h1>Eat Smart and Eat Well.</h1>
+            <p class="hero-tagline">Your meal planning companion</p>
             <p class="hero-subtitle">Affordable, healthy eating on campus powered by smart recommendations and real vendor data</p>
             <div class="hero-buttons">
                 <a href="/recipe-builder" class="btn btn-primary">Build Your Recipe</a>
+                <a href="/healthy" class="btn btn-primary">Find Budget Meals</a>
                 <a href="/map" class="btn btn-secondary">Find Food Vendors</a>
             </div>
         </div>
@@ -85,32 +108,7 @@
             </div>
         </section>
 
-        <!-- How It Works Section -->
-        <section class="container" style="margin: clamp(3rem, 8vw, 6rem) 0;">
-            <h2 style="text-align: center; margin-bottom: clamp(2rem, 5vw, 4rem);">How It Works</h2>
-            <div class="card-grid">
-                <div class="card feature-card">
-                    <div class="feature-icon" style="font-size: 2.5rem;">1️⃣</div>
-                    <h3>Choose Your Base</h3>
-                    <p>Pick a base food like rice, beans, yam, or pasta to start your meal.</p>
-                </div>
-                <div class="card feature-card">
-                    <div class="feature-icon" style="font-size: 2.5rem;">2️⃣</div>
-                    <h3>Pick Your Style</h3>
-                    <p>Choose how you want to cook it based on our curated Nigerian recipes.</p>
-                </div>
-                <div class="card feature-card">
-                    <div class="feature-icon" style="font-size: 2.5rem;">3️⃣</div>
-                    <h3>Add Proteins</h3>
-                    <p>Select proteins to complement your meal for complete nutrition.</p>
-                </div>
-                <div class="card feature-card">
-                    <div class="feature-icon" style="font-size: 2.5rem;">4️⃣</div>
-                    <h3>Get AI Recipe</h3>
-                    <p>Our AI generates a full recipe with ingredients, steps, and cost estimate.</p>
-                </div>
-            </div>
-        </section>
+
 
         <!-- SDG Section -->
         <section class="sdg-section">
@@ -178,8 +176,8 @@
                 <div class="footer-col">
                     <h4>Contact</h4>
                     <ul>
-                        <li>Email: info@mazi-eats.com</li>
-                        <li>Campus: University of Lagos</li>
+                        <li><a href="https://mazimum.onrender.com" target="_blank">Mazimum</a></li>
+                        <li>Campus: University of Lagos, Akoka</li>
                         <li>Location: Akoka, Yaba</li>
                     </ul>
                 </div>
@@ -198,29 +196,29 @@
     <script>
         // Hamburger Menu Toggle (Click Only - No Swipe)
         const hamburger = document.getElementById('hamburger');
-        const navLinks = document.getElementById('navLinks');
+        const navLinksElement = document.getElementById('navLinks');
 
         if (hamburger) {
             // Only handle direct clicks
             hamburger.addEventListener('click', (e) => {
                 e.stopPropagation();
                 hamburger.classList.toggle('active');
-                navLinks.classList.toggle('active');
+                navLinksElement.classList.toggle('active');
             });
 
             // Close menu when a link is clicked
-            document.querySelectorAll('.nav-links a').forEach(link => {
+            navLinksElement.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', () => {
                     hamburger.classList.remove('active');
-                    navLinks.classList.remove('active');
+                    navLinksElement.classList.remove('active');
                 });
             });
 
             // Close menu when clicking outside
             document.addEventListener('click', (e) => {
-                if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                if (!hamburger.contains(e.target) && !navLinksElement.contains(e.target)) {
                     hamburger.classList.remove('active');
-                    navLinks.classList.remove('active');
+                    navLinksElement.classList.remove('active');
                 }
             });
         }
@@ -257,6 +255,58 @@
         
         updateActiveNavLink();
         window.addEventListener('popstate', updateActiveNavLink);
+
+        // Hamburger menu drawer functionality
+        const navToggle = document.getElementById('navToggle');
+        const navDrawer = document.getElementById('navDrawer');
+        const navOverlay = document.getElementById('navOverlay');
+        const navDrawerLinks = document.querySelectorAll('.nav-drawer-link');
+
+        // Toggle menu
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('active');
+            navDrawer.classList.toggle('open');
+            navOverlay.classList.toggle('show');
+        });
+
+        // Close menu on overlay click
+        navOverlay.addEventListener('click', () => {
+            navToggle.classList.remove('active');
+            navDrawer.classList.remove('open');
+            navOverlay.classList.remove('show');
+        });
+
+        // Close menu on link click
+        navDrawerLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                navDrawer.classList.remove('open');
+                navOverlay.classList.remove('show');
+            });
+        });
+
+        // Close menu on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                navToggle.classList.remove('active');
+                navDrawer.classList.remove('open');
+                navOverlay.classList.remove('show');
+            }
+        });
+
+        // Update drawer active link
+        function updateDrawerActiveLink() {
+            const currentPage = window.location.pathname;
+            document.querySelectorAll('.nav-drawer-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage || (currentPage === '/' && href === '/')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        updateDrawerActiveLink();
     </script>
 </body>
 </html>

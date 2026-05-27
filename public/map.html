@@ -3,545 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Food Map - MAZI-EATS</title>
+    <title>MAZI-EATS Terminal - Campus Food Map</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
     <style>
-        .map-page-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 64px);
-            margin-top: 64px;
-        }
-
-        .map-toolbar {
-            background: var(--surface, #fff);
-            border-bottom: 1px solid var(--border, #e8f0eb);
-            padding: 0.75rem 1rem;
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-            flex-wrap: wrap;
-            z-index: 100;
-            box-shadow: 0 2px 8px rgba(26,107,60,0.08);
-        }
-
-        .search-wrapper {
-            position: relative;
-            flex: 1;
-            min-width: 200px;
-            max-width: 400px;
-        }
-
-        .search-wrapper input {
-            width: 100%;
-            padding: 0.6rem 1rem 0.6rem 2.5rem;
-            border: 1.5px solid var(--border, #e8f0eb);
-            border-radius: 50px;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.2s;
-            background: var(--bg-light, #f7faf8);
-            box-sizing: border-box;
-        }
-
-        .search-wrapper input:focus {
-            border-color: var(--primary, #1a6b3c);
-            background: #fff;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.85rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1rem;
-            color: var(--text-light, #8888aa);
-            pointer-events: none;
-        }
-
-        .search-results {
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            right: 0;
-            background: #fff;
-            border: 1px solid var(--border, #e8f0eb);
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            z-index: 9999;
-            max-height: 280px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .search-results.show { display: block; }
-
-        .search-result-item {
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border, #e8f0eb);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            transition: background 0.15s;
-        }
-
-        .search-result-item:last-child { border-bottom: none; }
-        .search-result-item:hover { background: var(--bg-light, #f7faf8); }
-
-        .search-result-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
-
-        .search-result-info { flex: 1; }
-        .search-result-name { font-weight: 600; font-size: 0.875rem; color: var(--text-dark, #1a1a2e); }
-        .search-result-sub { font-size: 0.75rem; color: var(--text-light, #8888aa); }
-
-        .filter-pills {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-pill {
-            padding: 0.4rem 0.9rem;
-            border-radius: 50px;
-            border: 1.5px solid var(--border, #e8f0eb);
-            background: #fff;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-            color: var(--text-mid, #4a4a6a);
-        }
-
-        .filter-pill:hover { border-color: var(--primary, #1a6b3c); color: var(--primary, #1a6b3c); }
-        .filter-pill.active { background: var(--primary, #1a6b3c); color: #fff; border-color: var(--primary, #1a6b3c); }
-        .filter-pill.active.store { background: #2e7d32; border-color: #2e7d32; }
-        .filter-pill.active.restaurant { background: #c62828; border-color: #c62828; }
-        .filter-pill.active.snack { background: #e65100; border-color: #e65100; }
-
-        .locate-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            border: 1.5px solid var(--primary, #1a6b3c);
-            background: #fff;
-            color: var(--primary, #1a6b3c);
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .locate-btn:hover { background: var(--primary, #1a6b3c); color: #fff; }
-        .locate-btn.locating { animation: pulse 1s infinite; }
-
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-        .map-container {
-            flex: 1;
-            position: relative;
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-            min-height: 400px;
-        }
-
-        /* Bottom info drawer for mobile */
-        .bottom-drawer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #fff;
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 -8px 32px rgba(0,0,0,0.15);
-            z-index: 1000;
-            transform: translateY(100%);
-            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .bottom-drawer.open { transform: translateY(0); }
-
-        .drawer-handle {
-            width: 40px;
-            height: 4px;
-            background: #ddd;
-            border-radius: 2px;
-            margin: 0.75rem auto 0;
-        }
-
-        .drawer-content { padding: 1rem 1.25rem 2rem; }
-        .drawer-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: var(--bg-light, #f7faf8);
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Leaflet popup custom styles */
-        .leaflet-popup-content-wrapper {
-            border-radius: 16px !important;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important;
-            padding: 0 !important;
+        /* Map-specific styles */
+        body {
             overflow: hidden;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .leaflet-popup-content { margin: 0 !important; width: 280px !important; }
-        .leaflet-popup-tip-container { display: none; }
-
-        .popup-header {
-            padding: 1rem;
-            color: #fff;
-            position: relative;
+        /* Full-screen map */
+        #map {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            filter: brightness(0.9) contrast(1.1);
+            pointer-events: auto;
+            touch-action: pan-x pan-y;
+            -webkit-tap-highlight-color: transparent;
+            will-change: transform;
         }
 
-        .popup-category-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-            font-size: 0.7rem;
+        .leaflet-tile-container,
+        .leaflet-map-pane,
+        .leaflet-zoom-animated {
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: transform;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .leaflet-container a,
+        .leaflet-container button,
+        .filter-pill,
+        .locate-btn,
+        .search-box input {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .map-search-bar::before {
+            content: '> ';
+            color: #00ff88;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.2rem 0.6rem;
-            border-radius: 50px;
-            margin-bottom: 0.4rem;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
         }
 
-        .popup-name {
-            font-size: 1rem;
-            font-weight: 700;
-            margin: 0;
-            line-height: 1.3;
+        .map-search-bar {
+            padding-left: 60px;
         }
 
-        .popup-body { padding: 1rem; }
-
-        .popup-info-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.825rem;
-            color: var(--text-mid, #4a4a6a);
-        }
-
-        .popup-info-icon { flex-shrink: 0; font-size: 0.9rem; }
-
-        .popup-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-        }
-
-        .popup-btn {
-            flex: 1;
-            padding: 0.55rem;
-            border-radius: 10px;
-            border: none;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.35rem;
-        }
-
-        .popup-btn-primary {
-            background: var(--primary, #1a6b3c);
-            color: #fff;
-        }
-
-        .popup-btn-primary:hover { background: var(--primary-dark, #0d4a28); }
-
-        .popup-btn-secondary {
-            background: var(--bg-light, #f7faf8);
-            color: var(--text-mid, #4a4a6a);
-            border: 1px solid var(--border, #e8f0eb);
-        }
-
-        .popup-btn-secondary:hover { background: var(--border, #e8f0eb); }
-
-        /* Routing control custom styles */
-        .leaflet-routing-container {
-            background: #fff;
-            padding: 0.75rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-            max-width: 280px;
-            font-size: 0.8rem;
-        }
-
-        .leaflet-routing-alt { max-height: 200px; overflow-y: auto; }
-
-        /* User location pulse */
-        .user-location-pulse {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #2196F3;
-            border: 3px solid #fff;
-            box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
-            animation: locationPulse 2s infinite;
-        }
-
-        @keyframes locationPulse {
-            0% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(33, 150, 243, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0); }
-        }
-
-        /* Legend overlay on map */
-        .map-legend {
-            position: absolute;
-            bottom: 1rem;
-            right: 1rem;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(8px);
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-            z-index: 500;
-            font-size: 0.8rem;
-        }
-
-        .legend-title {
-            font-weight: 700;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-light, #8888aa);
-            margin-bottom: 0.5rem;
-        }
-
-        .legend-row {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.35rem;
-            color: var(--text-dark, #1a1a2e);
-        }
-
-        .legend-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
-            flex-shrink: 0;
-        }
-
-        .routing-clear-btn {
-            position: absolute;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 999;
-            background: #c62828;
-            color: #fff;
-            border: none;
-            padding: 0.5rem 1.25rem;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(198,40,40,0.3);
+        header, footer {
             display: none;
         }
 
-        .routing-clear-btn.show { display: block; }
-
-        @media (max-width: 768px) {
-            .map-page-wrapper { margin-top: 60px; height: calc(100vh - 60px); }
-            .map-toolbar { padding: 0.6rem 0.75rem; }
-            .search-wrapper { max-width: none; }
-            .map-legend { bottom: 0.5rem; right: 0.5rem; padding: 0.5rem 0.75rem; }
-            .leaflet-popup-content { width: 240px !important; }
+        main {
+            display: none;
         }
     </style>
 </head>
-<body>
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-container container">
-            <a href="/" class="logo">🍽️ MAZI-EATS</a>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="/">Home</a></li>
-                <li><a href="/recipe-builder">Recipe Builder</a></li>
-                <li><a href="/map" class="active">Find Food</a></li>
-                <li><a href="/healthy">Healthy on Budget</a></li>
-            </ul>
-            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-                <span></span><span></span><span></span>
-            </button>
+<body class="map-page">
+    <!-- Full-screen map -->
+    <div id="map"></div>
+
+    <!-- Navigation hamburger menu -->
+     <!-- Navigation hamburger menu -->
+    <button class="nav-hamburger" id="navToggle" title="Menu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+    </button>
+
+    <!-- Navigation drawer -->
+    <nav class="nav-drawer" id="navDrawer">
+        <div class="nav-drawer-content">
+            <div class="nav-drawer-links">
+                <a href="/" class="nav-drawer-link"><em>🏠</em> Home</a>
+                <a href="/recipe-builder" class="nav-drawer-link"><em>👨‍🍳</em> Recipe Builder</a>
+                <a href="/map" class="nav-drawer-link"><em>🗺️</em> Campus Map</a>
+                <a href="/healthy" class="nav-drawer-link"><em>💪</em> Budget Meals</a>
+            </div>
         </div>
     </nav>
 
-    <!-- Map Page Layout -->
-    <div class="map-page-wrapper">
 
-        <!-- Toolbar: Search + Filters + Locate -->
-        <div class="map-toolbar">
-            <!-- Search -->
-            <div class="search-wrapper">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="Search food vendors on campus..." autocomplete="off">
-                <div class="search-results" id="searchResults"></div>
-            </div>
+    <!-- Navigation overlay -->
+    <div class="nav-overlay" id="navOverlay"></div>
 
-            <!-- Filters -->
-            <div class="filter-pills">
-                <button class="filter-pill active" data-filter="all">All</button>
-                <button class="filter-pill store" data-filter="stores">🏪 Stores</button>
-                <button class="filter-pill restaurant" data-filter="restaurants">🍽️ Restaurants</button>
-                <button class="filter-pill snack" data-filter="snacks">🌮 Snacks</button>
-            </div>
+    <!-- Floating search bar -->
+    <div class="map-search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="mapSearch" placeholder="search food_vendors --location campus" />
+        <span class="locate-icon" id="centerBtn" title="Center map">📍</span>
+    </div>
 
-            <!-- Locate Me -->
-            <button class="locate-btn" id="locateBtn">
-                📍 Locate Me
-            </button>
+    <!-- Search results dropdown -->
+    <div class="search-results" id="searchResults"></div>
+
+    <!-- Category filter pills -->
+    <div class="filter-pills" id="filterPills">
+        <button class="filter-pill active" data-filter="all">[all]</button>
+        <button class="filter-pill" data-filter="stores">[stores]</button>
+        <button class="filter-pill" data-filter="restaurants">[restaurants]</button>
+        <button class="filter-pill" data-filter="snacks">[snacks]</button>
+    </div>
+
+    <!-- Floating action buttons -->
+    <div class="fab-container">
+        <button class="fab" id="locateBtn" title="Your location">◉</button>
+        <button class="fab" id="zoomInBtn" title="Zoom in">◇</button>
+        <button class="fab" id="zoomOutBtn" title="Zoom out">◆</button>
+    </div>
+
+    <!-- Navigation tracking banner -->
+    <div class="nav-banner" id="navBanner">
+        <div class="nav-info">
+            <div class="nav-destination" id="navDestination"></div>
+            <div class="nav-details" id="navDetails"></div>
         </div>
+        <button class="nav-stop-btn" id="navStopBtn">Stop</button>
+    </div>
 
-        <!-- Map Container -->
-        <div class="map-container">
-            <div id="map"></div>
-
-            <!-- Clear Route Button -->
-            <button class="routing-clear-btn" id="clearRouteBtn">✕ Clear Route</button>
-
-            <!-- Legend -->
-            <div class="map-legend">
-                <div class="legend-title">Map Key</div>
-                <div class="legend-row"><div class="legend-dot" style="background:#2e7d32"></div> Food Store</div>
-                <div class="legend-row"><div class="legend-dot" style="background:#c62828"></div> Restaurant</div>
-                <div class="legend-row"><div class="legend-dot" style="background:#e65100"></div> Snack Point</div>
-                <div class="legend-row"><div class="legend-dot" style="background:#2196F3"></div> You</div>
+    <!-- Bottom sheet (place card) -->
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="sheet-handle"></div>
+        <img class="sheet-image" id="sheetImage" src="" alt="Vendor image" loading="lazy" />
+        <div class="sheet-content">
+            <div class="sheet-header">
+                <div class="sheet-title-group">
+                    <div class="sheet-vendor-name" id="sheetVendorName"></div>
+                    <div class="sheet-rating" id="sheetRating"></div>
+                </div>
+            </div>
+            <div class="sheet-category" id="sheetCategory"></div>
+            <div class="sheet-info-row">
+                <span class="sheet-info-icon">📍</span>
+                <span id="sheetLocation"></span>
+            </div>
+            <div class="sheet-info-row">
+                <span class="sheet-info-icon">🕐</span>
+                <span id="sheetHours"></span>
+            </div>
+            <div class="sheet-info-row">
+                <span class="sheet-info-icon">💰</span>
+                <span id="sheetPrice"></span>
+            </div>
+            <div class="sheet-info-row">
+                <span class="sheet-info-icon">ℹ️</span>
+                <span id="sheetDescription"></span>
+            </div>
+            <div class="sheet-actions">
+                <button class="sheet-action-btn btn-directions" id="directionsBtn">🗺️ Get Directions</button>
+                <button class="sheet-action-btn btn-share" id="shareBtn">📤 Share</button>
             </div>
         </div>
     </div>
 
-    <!-- Mobile Bottom Drawer (place details) -->
-    <div class="bottom-drawer" id="bottomDrawer">
-        <div class="drawer-handle"></div>
-        <button class="drawer-close" id="drawerClose">✕</button>
-        <div class="drawer-content" id="drawerContent"></div>
-    </div>
-
-    <!-- Toast Container -->
+    <!-- Toast container -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-col">
-                    <h4>About MAZI-EATS</h4>
-                    <p>Smart meal planning for Unilag students. Plan meals, find vendors, and eat healthy on a budget.</p>
-                </div>
-                <div class="footer-col">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/recipe-builder">Recipe Builder</a></li>
-                        <li><a href="/map">Find Food</a></li>
-                        <li><a href="/healthy">Budget Meals</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Contact</h4>
-                    <ul>
-                        <li>Campus: University of Lagos</li>
-                        <li>Akoka, Yaba, Lagos</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 MAZI-EATS. All rights reserved.</p>
-                <p>Built by <span class="footer-built">Mazimum</span></p>
-            </div>
-        </div>
-    </footer>
+    <!-- Leaflet & Routing -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
-    <!-- Scripts -->
+    <!-- Map script -->
+    <script src="/js/map.js"></script>
+
+    <!-- Navigation menu script -->
     <script>
-        // Hamburger Menu Toggle (Click Only - No Swipe)
-        const hamburger = document.getElementById('hamburger');
-        const navLinks = document.getElementById('navLinks');
-        if (hamburger) {
-            hamburger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                hamburger.classList.toggle('active');
-                navLinks.classList.toggle('active');
-            });
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    navLinks.classList.remove('active');
-                });
-            });
-            document.addEventListener('click', (e) => {
-                if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
-                    hamburger.classList.remove('active');
-                    navLinks.classList.remove('active');
-                }
-            });
-        }
+        const navToggle = document.getElementById('navToggle');
+        const navDrawer = document.getElementById('navDrawer');
+        const navOverlay = document.getElementById('navOverlay');
+        const navLinks = document.querySelectorAll('.nav-drawer-link');
 
-        // Active nav link highlighting
-        function updateActiveNavLink() {
+        // Toggle menu
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('active');
+            navDrawer.classList.toggle('open');
+            navOverlay.classList.toggle('show');
+        });
+
+        // Close menu on overlay click
+        navOverlay.addEventListener('click', () => {
+            navToggle.classList.remove('active');
+            navDrawer.classList.remove('open');
+            navOverlay.classList.remove('show');
+        });
+
+        // Close menu on link click (navigation happens automatically)
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                navDrawer.classList.remove('open');
+                navOverlay.classList.remove('show');
+            });
+        });
+
+        // Close menu on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                navToggle.classList.remove('active');
+                navDrawer.classList.remove('open');
+                navOverlay.classList.remove('show');
+            }
+        });
+
+        // Update drawer active link based on current page
+        function updateDrawerActiveLink() {
             const currentPage = window.location.pathname;
-            document.querySelectorAll('.nav-links a').forEach(link => {
+            document.querySelectorAll('.nav-drawer-link').forEach(link => {
                 const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === '/map' && href === '/map')) {
+                if (href === currentPage || (currentPage === '/' && href === '/')) {
                     link.classList.add('active');
                 } else {
                     link.classList.remove('active');
                 }
             });
         }
-        updateActiveNavLink();
-
-        const drawerClose = document.getElementById('drawerClose');
-        if (drawerClose) {
-            drawerClose.addEventListener('click', () => {
-                document.getElementById('bottomDrawer').classList.remove('open');
-            });
-        }
+        updateDrawerActiveLink();
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-    <script src="/js/map.js"></script>
 </body>
 </html>
