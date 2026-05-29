@@ -37,6 +37,16 @@ function serve_static_file(path::AbstractString)
         "application/javascript; charset=utf-8"
     elseif endswith(filepath, ".json")
         "application/json; charset=utf-8"
+    elseif endswith(filepath, ".jpg") || endswith(filepath, ".jpeg")
+        "image/jpeg"
+    elseif endswith(filepath, ".png")
+        "image/png"
+    elseif endswith(filepath, ".webp")
+        "image/webp"
+    elseif endswith(filepath, ".gif")
+        "image/gif"
+    elseif endswith(filepath, ".svg")
+        "image/svg+xml"
     else
         "application/octet-stream"
     end
@@ -54,7 +64,7 @@ function route_handler(request::HTTP.Request)
     target = HTTP.URI(request.target).path
     target = target == "" ? "/" : target
     
-    # Routes
+    # 1. Page Routes
     if method == "GET" && target == "/"
         return serve_static_file("index.html")
     elseif method == "GET" && target == "/recipe-builder"
@@ -63,21 +73,30 @@ function route_handler(request::HTTP.Request)
         return serve_static_file("map.html")
     elseif method == "GET" && target == "/healthy"
         return serve_static_file("healthy.html")
-    elseif method == "GET" && startswith(target, "/public/")
-        return serve_static_file(String(target[9:end]))  # strips "/public/" leaving "css/style.css"
-    elseif method == "GET" && startswith(target, "/css/")
-        return serve_static_file(String(target[2:end]))
-    elseif method == "GET" && startswith(target, "/js/")
-        return serve_static_file(String(target[2:end]))
+        
+    # 2. FIXED STATIC ASSET ROUTER (Replaces all your old /img/, /css/, /js/ lines)
+    elseif method == "GET" && (
+        startswith(target, "/public/") || 
+        startswith(target, "/img/") || 
+        startswith(target, "/css/") || 
+        startswith(target, "/js/") || 
+        startswith(target, "/assets/")
+    )
+        # Strip the leading "/" safely using normpath so it correctly matches your public directory
+        clean_path = lstrip(target, '/')
+        return serve_static_file(clean_path)
+        
+    # 3. API Handlers
     elseif method == "POST" && target == "/api/recipe"
         return RecipeController.handle_recipe_request(request)
     elseif method == "POST" && target == "/api/healthy"
         return HealthyController.handle_healthy_request(request)
+        
+    # 4. Fallback Error
     else
-        return HTTP.Response(404, JSON3.write(Dict("error" => "Route not found")))
+        return HTTP.Response(404, ["Content-Type" => "application/json"], JSON3.write(Dict("error" => "Route not found")))
     end
 end
-
 """
     start_server(port::Int=8080)
 

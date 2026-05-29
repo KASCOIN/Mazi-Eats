@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAZI-EATS - Smart Meal Planning for Unilag Students</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
-<body>
-    <!-- Navigation hamburger menu -->
+<body class="home-page">
+    <!-- Navigation hamburger menu 
     <button class="nav-hamburger" id="navToggle" title="Menu">
         <div class="hamburger-line"></div>
         <div class="hamburger-line"></div>
         <div class="hamburger-line"></div>
-    </button>
+    </button>-->
 
     <!-- Navigation drawer -->
     <nav class="nav-drawer" id="navDrawer">
@@ -29,25 +30,17 @@
     <!-- Navigation overlay -->
     <div class="nav-overlay" id="navOverlay"></div>
 
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-container container">
-            <a href="/" class="logo">🍽️ MAZI-EATS</a>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="/" class="active">Home</a></li>
-                <li><a href="/recipe-builder">Recipe Builder</a></li>
-                <li><a href="/map">Find Food</a></li>
-                <li><a href="/healthy">Healthy on Budget</a></li>
-            </ul>
-            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+    <!-- Top Row Header -->
+    <header class="header">
+        <!-- Logo -->
+        <div href="/" class="logo"><span class="first-name">MAZI-</span>EATS</div>
+        <!-- User Profile -->
+        <div class="user-profile">
+            <a href="/profile" class="profile-link">👤</a>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
+    <!-- Hero Section 
     <header class="hero">
         <div class="hero-emoji">🥗</div>
         <div class="hero-emoji">🍚</div>
@@ -64,9 +57,37 @@
             </div>
         </div>
     </header>
+-->
 
     <!-- Main Content -->
     <main>
+        <section class="top-row">
+            <div class="map-card"> 
+                <a target="_blank" rel="noopener noreferrer" href="/map">
+                    <img src="/img/image.jpeg" alt="Banana Island placeholder map image">
+                </a>
+                <span class="openmap-btn">
+                    Open Map
+                </span>
+            </div>
+        </section>
+
+        <!-- Highlights-->
+        <section id="highlights" class="highlights">
+            <span class="hcard card1"> 
+                <img src="/img/moremi.jpeg" class="h-img" alt="AI Meal Advisor Icon">
+            </span>
+            <span class="hcard card2">
+                <img src="/img/moremi.jpeg" class="h-img" alt="Campus Food Map Icon">
+            </span>
+            <span class="hcard card3">
+                <img src="/img/moremi.jpeg" class="h-img" alt="Campus Food Map Icon">
+            </span>
+            <span class="hcard card4">
+                <img src="/img/moremi.jpeg" class="h-img" alt="Campus Food Map Icon">
+            </span>
+        </section>
+
         <!-- Features Section -->
         <section class="features">
             <div class="container">
@@ -192,6 +213,15 @@
     <!-- Scroll to Top Button -->
     <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">↑</button>
 
+    <nav>
+        <div class="nav-pill"> 
+            <span class="routes home-page"> <a href="/" class="">Home </a></span>
+            <span class="routes map-page"> <a href="/map" class="">Map </a></span>
+            <span class="routes ai-advisor-page"> <a href="/healthy" class="">AI </a></span>
+            <span class="routes chef-mode-page"> <a href="/recipe-builder" class="">Chef </a></span>    
+        </div>
+    </nav>
+
     <!-- Scripts -->
     <script>
         // Hamburger Menu Toggle (Click Only - No Swipe)
@@ -308,5 +338,9 @@
         }
         updateDrawerActiveLink();
     </script>
+    <!-- Navigation menu script -->
+    <script src="/js/navigation.js"></script> 
+
+    <script src="/js/home.js"></script>
 </body>
 </html>

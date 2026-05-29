@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" /> />
     <style>
         /* Map-specific styles */
         body {
@@ -49,17 +50,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        .map-search-bar::before {
-            content: '> ';
-            color: #00ff88;
-            font-weight: 700;
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
-        }
-
-        .map-search-bar {
-            padding-left: 60px;
-        }
-
         header, footer {
             display: none;
         }
@@ -69,19 +59,20 @@
         }
     </style>
 </head>
+
 <body class="map-page">
     <!-- Full-screen map -->
     <div id="map"></div>
 
     <!-- Navigation hamburger menu -->
-     <!-- Navigation hamburger menu -->
+     <!-- Navigation hamburger menu 
     <button class="nav-hamburger" id="navToggle" title="Menu">
         <div class="hamburger-line"></div>
         <div class="hamburger-line"></div>
         <div class="hamburger-line"></div>
-    </button>
+    </button>-->
 
-    <!-- Navigation drawer -->
+    <!-- Navigation drawer 
     <nav class="nav-drawer" id="navDrawer">
         <div class="nav-drawer-content">
             <div class="nav-drawer-links">
@@ -91,17 +82,17 @@
                 <a href="/healthy" class="nav-drawer-link"><em>💪</em> Budget Meals</a>
             </div>
         </div>
-    </nav>
+    </nav>-->
 
-
-    <!-- Navigation overlay -->
-    <div class="nav-overlay" id="navOverlay"></div>
+    <!-- Navigation overlay 
+    <div class="nav-overlay" id="navOverlay"></div>-->
 
     <!-- Floating search bar -->
-    <div class="map-search-bar">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="mapSearch" placeholder="search food_vendors --location campus" />
-        <span class="locate-icon" id="centerBtn" title="Center map">📍</span>
+    <div class="map-search">
+        <div class="map-search-bar">
+            <span class="material-symbols-rounded">search</span>
+            <input type="text" id="mapSearch" placeholder=" Find Your Fav Spot" />
+        </div>
     </div>
 
     <!-- Search results dropdown -->
@@ -134,7 +125,9 @@
     <!-- Bottom sheet (place card) -->
     <div class="bottom-sheet" id="bottomSheet">
         <div class="sheet-handle"></div>
+
         <img class="sheet-image" id="sheetImage" src="" alt="Vendor image" loading="lazy" />
+        
         <div class="sheet-content">
             <div class="sheet-header">
                 <div class="sheet-title-group">
@@ -169,65 +162,25 @@
     <!-- Toast container -->
     <div id="toastContainer" class="toast-container"></div>
 
+    <!-- Floating Navigation Bar -->
+    <nav>
+        <div class="nav-pill"> 
+            <span class="routes home-page"> <a href="/" class="">Home </a></span>
+            <span class="routes map-page"> <a href="/map" class="">Map </a></span>
+            <span class="routes ai-advisor-page"> <a href="/healthy" class="">AI </a></span>
+            <span class="routes chef-mode-page"> <a href="/recipe-builder" class="">Chef </a></span>    
+        </div>
+    </nav>
+
     <!-- Leaflet & Routing -->
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
-    <!-- Map script -->
-    <script src="/js/map.js"></script>
+   
 
     <!-- Navigation menu script -->
-    <script>
-        const navToggle = document.getElementById('navToggle');
-        const navDrawer = document.getElementById('navDrawer');
-        const navOverlay = document.getElementById('navOverlay');
-        const navLinks = document.querySelectorAll('.nav-drawer-link');
-
-        // Toggle menu
-        navToggle.addEventListener('click', () => {
-            navToggle.classList.toggle('active');
-            navDrawer.classList.toggle('open');
-            navOverlay.classList.toggle('show');
-        });
-
-        // Close menu on overlay click
-        navOverlay.addEventListener('click', () => {
-            navToggle.classList.remove('active');
-            navDrawer.classList.remove('open');
-            navOverlay.classList.remove('show');
-        });
-
-        // Close menu on link click (navigation happens automatically)
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navToggle.classList.remove('active');
-                navDrawer.classList.remove('open');
-                navOverlay.classList.remove('show');
-            });
-        });
-
-        // Close menu on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                navToggle.classList.remove('active');
-                navDrawer.classList.remove('open');
-                navOverlay.classList.remove('show');
-            }
-        });
-
-        // Update drawer active link based on current page
-        function updateDrawerActiveLink() {
-            const currentPage = window.location.pathname;
-            document.querySelectorAll('.nav-drawer-link').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === '/' && href === '/')) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-        }
-        updateDrawerActiveLink();
-    </script>
+    <script src="/js/navigation.js"></script> 
+    <!-- Map script -->
+    <script src="/js/map.js"></script>
 </body>
 </html>

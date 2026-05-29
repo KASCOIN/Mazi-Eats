@@ -6,7 +6,7 @@
     <title>Recipe Builder - MAZI-EATS</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="chef-mode-page">
     <!-- Navigation hamburger menu -->
     <button class="nav-hamburger" id="navToggle" title="Menu">
         <div class="hamburger-line"></div>
@@ -304,124 +304,15 @@
     <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">↑</button>
 
     <!-- Navigation Scripts -->
-    <script>
-        // Hamburger Menu Toggle (Click Only - No Swipe)
-        const hamburger = document.getElementById('hamburger');
-        const navLinksElement = document.getElementById('navLinks');
-
-        if (hamburger) {
-            // Only handle direct clicks
-            hamburger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                hamburger.classList.toggle('active');
-                navLinksElement.classList.toggle('active');
-            });
-
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    navLinksElement.classList.remove('active');
-                });
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!hamburger.contains(e.target) && !navLinksElement.contains(e.target)) {
-                    hamburger.classList.remove('active');
-                    navLinksElement.classList.remove('active');
-                }
-            });
-        }
-
-        // Scroll to Top Button
-        const scrollToTop = document.getElementById('scrollToTop');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {
-                scrollToTop.classList.add('show');
-            } else {
-                scrollToTop.classList.remove('show');
-            }
-        });
-
-        scrollToTop.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        // Active nav link highlighting
-        function updateActiveNavLink() {
-            const currentPage = window.location.pathname;
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === '/recipe-builder' && href === '/recipe-builder')) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-        }
-        updateActiveNavLink();
-
-        // Show back button on mobile for recipe steps
-        function updateBackButton() {
-            const backButton = document.getElementById('backButton');
-            if (backButton) {
-                backButton.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
-            }
-        }
-        updateBackButton();
-        window.addEventListener('resize', updateBackButton);
-
-        // Hamburger menu drawer functionality
-        const navToggle = document.getElementById('navToggle');
-        const navDrawer = document.getElementById('navDrawer');
-        const navOverlay = document.getElementById('navOverlay');
-        const navDrawerLinks = document.querySelectorAll('.nav-drawer-link');
-
-        // Toggle menu
-        navToggle.addEventListener('click', () => {
-            navToggle.classList.toggle('active');
-            navDrawer.classList.toggle('open');
-            navOverlay.classList.toggle('show');
-        });
-
-        // Close menu on overlay click
-        navOverlay.addEventListener('click', () => {
-            navToggle.classList.remove('active');
-            navDrawer.classList.remove('open');
-            navOverlay.classList.remove('show');
-        });
-
-        // Close menu on link click
-        navDrawerLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navToggle.classList.remove('active');
-                navDrawer.classList.remove('open');
-                navOverlay.classList.remove('show');
-            });
-        });
-
-        // Close menu on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                navToggle.classList.remove('active');
-                navDrawer.classList.remove('open');
-                navOverlay.classList.remove('show');
-            }
-        });
-
-        // Update drawer active link
-        function updateDrawerActiveLink() {
-            const currentPage = window.location.pathname;
-            document.querySelectorAll('.nav-drawer-link').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === '/recipe-builder' && href === '/recipe-builder')) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-        }
-        updateDrawerActiveLink();
-    </script>
+    <nav>
+        <div class="nav-pill"> 
+            <span class="routes home-page"> <a href="/" class="">Home </a></span>
+            <span class="routes map-page"> <a href="/map" class="">Map </a></span>
+            <span class="routes ai-advisor-page"> <a href="/healthy" class="">AI </a></span>
+            <span class="routes chef-mode-page"> <a href="/recipe-builder" class="">Chef </a></span>    
+        </div>
+    </nav>
+    <script src="/js/navigation.js"></script>
 
     <script src="/js/recipe.js"></script>
 </body>
