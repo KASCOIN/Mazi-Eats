@@ -548,7 +548,7 @@ function locateUser() {
     }
     
     const btn = document.getElementById('locateBtn');
-    btn.textContent = '⏳';
+    const icon = document.getElementById('locateIcon');
     
     navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -563,11 +563,11 @@ function locateUser() {
             // Pan to user, don't zoom
             map.panTo([lat, lng]);
             
-            btn.textContent = '🧑‍🎓';
+            icon.innerHTML = 'my_location';
             showToast('Location found', 'success');
         },
         () => {
-            btn.textContent = '🧑‍🎓';
+            icon.innerHTML = 'location_disabled';
             showToast('Unable to get location', 'error');
         }
     );

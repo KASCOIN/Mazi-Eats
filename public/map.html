@@ -64,29 +64,6 @@
     <!-- Full-screen map -->
     <div id="map"></div>
 
-    <!-- Navigation hamburger menu -->
-     <!-- Navigation hamburger menu 
-    <button class="nav-hamburger" id="navToggle" title="Menu">
-        <div class="hamburger-line"></div>
-        <div class="hamburger-line"></div>
-        <div class="hamburger-line"></div>
-    </button>-->
-
-    <!-- Navigation drawer 
-    <nav class="nav-drawer" id="navDrawer">
-        <div class="nav-drawer-content">
-            <div class="nav-drawer-links">
-                <a href="/" class="nav-drawer-link"><em>🏠</em> Home</a>
-                <a href="/recipe-builder" class="nav-drawer-link"><em>👨‍🍳</em> Recipe Builder</a>
-                <a href="/map" class="nav-drawer-link"><em>🗺️</em> Campus Map</a>
-                <a href="/healthy" class="nav-drawer-link"><em>💪</em> Budget Meals</a>
-            </div>
-        </div>
-    </nav>-->
-
-    <!-- Navigation overlay 
-    <div class="nav-overlay" id="navOverlay"></div>-->
-
     <!-- Floating search bar -->
     <div class="map-search">
         <div class="map-search-bar">
@@ -100,17 +77,25 @@
 
     <!-- Category filter pills -->
     <div class="filter-pills" id="filterPills">
-        <button class="filter-pill active" data-filter="all">[all]</button>
-        <button class="filter-pill" data-filter="stores">[stores]</button>
-        <button class="filter-pill" data-filter="restaurants">[restaurants]</button>
-        <button class="filter-pill" data-filter="snacks">[snacks]</button>
+        <button class="filter-pill active" data-filter="all">All</button>
+        <button class="filter-pill" data-filter="stores">Stores</button>
+        <button class="filter-pill" data-filter="restaurants">Restaurants</button>
+        <button class="filter-pill" data-filter="snacks">Snacks</button>
     </div>
 
     <!-- Floating action buttons -->
     <div class="fab-container">
-        <button class="fab" id="locateBtn" title="Your location">◉</button>
-        <button class="fab" id="zoomInBtn" title="Zoom in">◇</button>
-        <button class="fab" id="zoomOutBtn" title="Zoom out">◆</button>
+        <button class="fab" id="locateBtn" title="Your location">
+            <span class="material-symbols-rounded" id="locateIcon">location_searching</span>
+        </button>
+
+        <button class="fab" id="zoomInBtn" title="Zoom in">
+            <span class="material-symbols-rounded">zoom_in</span>
+        </button>
+
+        <button class="fab" id="zoomOutBtn" title="Zoom out">
+            <span class="material-symbols-rounded">zoom_out</span>
+        </button>
     </div>
 
     <!-- Navigation tracking banner -->
@@ -127,7 +112,7 @@
         <div class="sheet-handle"></div>
 
         <img class="sheet-image" id="sheetImage" src="" alt="Vendor image" loading="lazy" />
-        
+
         <div class="sheet-content">
             <div class="sheet-header">
                 <div class="sheet-title-group">
