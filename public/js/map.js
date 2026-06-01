@@ -138,7 +138,7 @@ const vendors = {
             price: '₦500 – ₦1,500',
             description: 'Delicious grilled meat (suya) and perfectly spiced portions. Quick takeout.',
             emoji: '🌮',
-            image: 'https://images.unsplash.com/photo-1555939594-58d7cb561913?w=400&h=200&fit=crop',
+        image: '/img/suya.jpeg',
             rating: 4.4,
             reviews: 67
         },

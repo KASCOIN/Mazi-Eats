@@ -4,31 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAZI-EATS - Smart Meal Planning for Unilag Students</title>
+    <meta name="theme-color" content="#1B5E20">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/img/pwa-icon-192.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 <body class="home-page">
-    <!-- Navigation hamburger menu 
-    <button class="nav-hamburger" id="navToggle" title="Menu">
-        <div class="hamburger-line"></div>
-        <div class="hamburger-line"></div>
-        <div class="hamburger-line"></div>
-    </button>-->
-
-    <!-- Navigation drawer -->
-    <nav class="nav-drawer" id="navDrawer">
-        <div class="nav-drawer-content">
-            <div class="nav-drawer-links">
-                <a href="/" class="nav-drawer-link active"><em>🏠</em> Home</a>
-                <a href="/recipe-builder" class="nav-drawer-link"><em>👨‍🍳</em> Recipe Builder</a>
-                <a href="/map" class="nav-drawer-link"><em>🗺️</em> Campus Map</a>
-                <a href="/healthy" class="nav-drawer-link"><em>💪</em> Budget Meals</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Navigation overlay -->
-    <div class="nav-overlay" id="navOverlay"></div>
 
     <!-- Top Row Header -->
     <header class="header">
@@ -36,7 +20,9 @@
         <div href="/" class="logo"><span class="first-name">MAZI-</span>EATS</div>
         <!-- User Profile -->
         <div class="user-profile">
-            <a href="/profile" class="profile-link">👤</a>
+            <a href="/profile" class="profile-link">
+                <span class="material-symbols-rounded" style="height: 24px; width: 24px;">account_circle</span>
+            </a>
         </div>
     </header>
 
@@ -245,44 +231,30 @@
 
     <nav>
         <div class="nav-pill"> 
-            <span class="routes home-page"> <a href="/" class="">Home </a></span>
-            <span class="routes map-page"> <a href="/map" class="">Map </a></span>
-            <span class="routes ai-advisor-page"> <a href="/healthy" class="">AI </a></span>
-            <span class="routes chef-mode-page"> <a href="/recipe-builder" class="">Chef </a></span>    
+            <span class="routes home-page">
+                <span class="material-symbols-rounded">home</span>
+                <a href="/" class="">Home </a>
+            </span>
+
+            <span class="routes map-page">
+                <span class="material-symbols-rounded">map_search</span>
+                <a href="/map" class="">Map </a>
+            </span>
+
+            <span class="routes ai-advisor-page">
+                <span class="material-symbols-rounded">chat</span> 
+                <a href="/healthy" class="">AI </a>
+            </span>
+
+            <span class="routes chef-mode-page"> 
+                <span class="material-symbols-rounded">chef_hat</span>
+                <a href="/recipe-builder" class="">Chef</a>
+            </span>    
         </div>
     </nav>
 
     <!-- Scripts -->
     <script>
-        // Hamburger Menu Toggle (Click Only - No Swipe)
-        const hamburger = document.getElementById('hamburger');
-        const navLinksElement = document.getElementById('navLinks');
-
-        if (hamburger) {
-            // Only handle direct clicks
-            hamburger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                hamburger.classList.toggle('active');
-                navLinksElement.classList.toggle('active');
-            });
-
-            // Close menu when a link is clicked
-            navLinksElement.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    navLinksElement.classList.remove('active');
-                });
-            });
-
-            // Close menu when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!hamburger.contains(e.target) && !navLinksElement.contains(e.target)) {
-                    hamburger.classList.remove('active');
-                    navLinksElement.classList.remove('active');
-                }
-            });
-        }
-
         // Scroll to Top Button
         const scrollToTop = document.getElementById('scrollToTop');
         window.addEventListener('scroll', () => {
@@ -300,73 +272,6 @@
             });
         });
 
-        // Set active nav link based on current page
-        function updateActiveNavLink() {
-            const currentPage = window.location.pathname;
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === '/' && href === '/')) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-        }
-        
-        updateActiveNavLink();
-        window.addEventListener('popstate', updateActiveNavLink);
-
-        // Hamburger menu drawer functionality
-        const navToggle = document.getElementById('navToggle');
-        const navDrawer = document.getElementById('navDrawer');
-        const navOverlay = document.getElementById('navOverlay');
-        const navDrawerLinks = document.querySelectorAll('.nav-drawer-link');
-
-        // Toggle menu
-        navToggle.addEventListener('click', () => {
-            navToggle.classList.toggle('active');
-            navDrawer.classList.toggle('open');
-            navOverlay.classList.toggle('show');
-        });
-
-        // Close menu on overlay click
-        navOverlay.addEventListener('click', () => {
-            navToggle.classList.remove('active');
-            navDrawer.classList.remove('open');
-            navOverlay.classList.remove('show');
-        });
-
-        // Close menu on link click
-        navDrawerLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navToggle.classList.remove('active');
-                navDrawer.classList.remove('open');
-                navOverlay.classList.remove('show');
-            });
-        });
-
-        // Close menu on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                navToggle.classList.remove('active');
-                navDrawer.classList.remove('open');
-                navOverlay.classList.remove('show');
-            }
-        });
-
-        // Update drawer active link
-        function updateDrawerActiveLink() {
-            const currentPage = window.location.pathname;
-            document.querySelectorAll('.nav-drawer-link').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === '/' && href === '/')) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-        }
-        updateDrawerActiveLink();
     </script>
     <!-- Navigation menu script -->
     <script src="/js/navigation.js"></script> 

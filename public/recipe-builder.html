@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Builder - MAZI-EATS</title>
+    <meta name="theme-color" content="#1B5E20">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/img/pwa-icon-192.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 <body class="chef-mode-page">
     <!-- Navigation hamburger menu -->
@@ -303,13 +309,28 @@
     <!-- Scroll to Top Button -->
     <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">↑</button>
 
-    <!-- Navigation Scripts -->
+    <!-- Floating Navigation Bar -->
     <nav>
         <div class="nav-pill"> 
-            <span class="routes home-page"> <a href="/" class="">Home </a></span>
-            <span class="routes map-page"> <a href="/map" class="">Map </a></span>
-            <span class="routes ai-advisor-page"> <a href="/healthy" class="">AI </a></span>
-            <span class="routes chef-mode-page"> <a href="/recipe-builder" class="">Chef </a></span>    
+            <span class="routes home-page">
+                <span class="material-symbols-rounded">home</span>
+                <a href="/" class="">Home </a>
+            </span>
+
+            <span class="routes map-page">
+                <span class="material-symbols-rounded">map_search</span>
+                <a href="/map" class="">Map </a>
+            </span>
+
+            <span class="routes ai-advisor-page">
+                <span class="material-symbols-rounded">chat</span> 
+                <a href="/healthy" class="">AI </a>
+            </span>
+
+            <span class="routes chef-mode-page"> 
+                <span class="material-symbols-rounded">chef_hat</span>
+                <a href="/recipe-builder" class="">Chef</a>
+            </span>    
         </div>
     </nav>
     <script src="/js/navigation.js"></script>

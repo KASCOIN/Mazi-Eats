@@ -1,0 +1,8 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MAZI-EATS icon">
+  <rect width="192" height="192" rx="40" fill="#1B5E20"/>
+  <circle cx="96" cy="96" r="58" fill="#F9A825"/>
+  <path d="M60 90C60 74.536 72.536 62 88 62H104C119.464 62 132 74.536 132 90V100C132 124.853 111.853 145 87 145H85C71.745 145 61 134.255 61 121V90H60Z" fill="#FFF8E1"/>
+  <path d="M74 90H118" stroke="#1B5E20" stroke-width="10" stroke-linecap="round"/>
+  <path d="M74 108H108" stroke="#1B5E20" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="118" cy="126" r="10" fill="#1B5E20"/>
+</svg>

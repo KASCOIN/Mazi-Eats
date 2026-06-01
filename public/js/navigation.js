@@ -11,3 +11,11 @@ const navOptions = document.querySelectorAll('.routes');
                 option.classList.remove('nav-active');
             }
         })
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(error => {
+            console.warn('Service worker registration failed:', error);
+        });
+    });
+}

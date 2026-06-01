@@ -35,6 +35,8 @@ function serve_static_file(path::AbstractString)
         "text/css; charset=utf-8"
     elseif endswith(filepath, ".js")
         "application/javascript; charset=utf-8"
+    elseif endswith(filepath, ".webmanifest")
+        "application/manifest+json; charset=utf-8"
     elseif endswith(filepath, ".json")
         "application/json; charset=utf-8"
     elseif endswith(filepath, ".jpg") || endswith(filepath, ".jpeg")
@@ -73,6 +75,10 @@ function route_handler(request::HTTP.Request)
         return serve_static_file("map.html")
     elseif method == "GET" && target == "/healthy"
         return serve_static_file("healthy.html")
+    elseif method == "GET" && target == "/manifest.webmanifest"
+        return serve_static_file("manifest.webmanifest")
+    elseif method == "GET" && target == "/sw.js"
+        return serve_static_file("sw.js")
         
     # 2. FIXED STATIC ASSET ROUTER (Replaces all your old /img/, /css/, /js/ lines)
     elseif method == "GET" && (

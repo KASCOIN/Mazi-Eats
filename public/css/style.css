@@ -6,8 +6,14 @@
     --text-dark: #0a0908;
     --text-mid: #181513;
     --text-light: #837569;
-    --highlight-text: #fdc809;
-    --accent-text: #3f925b;
+    --highlight-text-light: #fdc809;
+    --highlight-text-dark: #4d3c03;
+    --accent-text-light: #3f925b;
+    --accent-text-dark: #15351f;
+
+    /* Border colors */
+    --border-light: rgba(131, 117, 105, 0.4);
+    --border-dark: rgba(51, 46, 41, 0.4);
     /* Terminal/Console Colors 
     --primary: #00ff88;
     --primary-dark: #00cc6a;
@@ -140,7 +146,7 @@ img, picture, video {
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(.5%);
     }
     to {
         opacity: 1;
@@ -204,22 +210,6 @@ img, picture, video {
     overflow-x: hidden;
 }
 
-/* ===== NAVIGATION ===== 
-nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(12px);
-    background: #F8F7FF;
-    border-bottom: 2px solid var(--primary);
-    height: 64px;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 100vw;
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-}
-*/
 .nav-container {
     display: flex;
     justify-content: space-between;
@@ -240,13 +230,13 @@ nav {
 
 .logo {
     border-radius: 25px;
-    padding: 10px;
+    padding: 5px;
     background-color:rgba(255, 250, 250, 0.4);
     border: 1px solid rgba(255, 250, 250, 0.8);
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
-    font-size: 1.25rem;
-    font-weight: 800;
+    font-size: 1em;
+    font-weight: 600;
     margin-left: 2.5%;
     text-decoration: none;
     gap: 0.5rem;
@@ -256,21 +246,23 @@ nav {
     color: #fdc807;
 }
 .user-profile {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 12px;
-    font-size: 1rem;
+    justify-content: center;
     background-color: rgba(255, 250, 250, 0.4);
-    border: 2px solid rgba(255, 250, 250, 0.8);
+    border: 1px solid rgba(255, 250, 250, 0.8);
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
-    border-radius: 50%;
+    border-radius: 100%;
     margin-right: 2.5%;
+    
   }
 
-
 .profile-link {
-    padding: 10px 12.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
 }
 
 .top-row {
@@ -286,7 +278,7 @@ nav {
 .map-card {
     position: relative;
     background-color: #FBDB65;
-    border: 2px solid rgba(251, 219, 101, 0.4);
+    border: 1px solid var(--border-dark);
     border-radius: 15px;
     width: 100%;
     overflow: hidden;
@@ -296,13 +288,13 @@ nav {
     position: absolute;
     bottom: 10px;
     right: 10px;
-    padding: 4px 8px;
+    padding: 4px;
     background-color: rgba(251, 219, 101, 0.4);
-    color: var(--highlight-text);
-    font-size: 1.2em;
+    color: var(--highlight-text-light);
+    font-size: .9em;
     font-weight: 600;
-    border: 1px solid rgba(251, 219, 101, 0.4);
-    border-radius: 15px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
     backdrop-filter: blur(10px);
 }
 
@@ -321,7 +313,7 @@ nav {
 }
 
 .hcard {
-    border: 1px solid rgba(80, 200, 120, 0.8);    
+    border: 1px solid var(--border-dark);    
     transition: all 0.3s ease-out;
     border-radius: 20px;
     overflow: hidden;
@@ -334,7 +326,7 @@ nav {
 .hcard:nth-child(5),
 .hcard:nth-child(6)
  {
-    flex: 0 0 40%; /* Shows fully with a peak at the next card */
+    flex: 0 0 35%; /* Shows fully with a peak at the next card */
 }
 
 /* Card 3: Sneak Peek Mode (Initially 20% width) */
@@ -346,19 +338,19 @@ nav {
 /* --- 4. IMAGE FIX --- */
 .h-img {
     width: 100%;
-    height: 17.5vh;
+    height: 12.5vh;
     object-fit: cover; /* CRITICAL: Prevents your image proportions from warping when the card squishes */
     display: block;
 }
 
 .hdetails {
-    height: 44px;
+    height: 7.5vh;
 }
 
 .hname {
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 1.25em;
+    font-size: 1em;
     font-weight: 600;
     color: var(--text-dark);
     padding: 10px;
@@ -366,7 +358,7 @@ nav {
 
 nav {
     position: fixed;
-    bottom: 2.5%;
+    bottom: 1.5%;
     width: 100%;
     height: fit-content;
     display: flex;
@@ -380,23 +372,27 @@ nav {
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(255, 250, 250, 0.6);
     border-radius: 35px;
-    padding: 10px;
+    padding: 7.5px;
     width: 80%;
     height: fit-content;
     display: flex;
     align-items: stretch;
     justify-content: space-between;
-    gap: 5px;
+    gap: 3.5px;
 }
 
 .routes {
     background-color: rgba(255, 250, 250, 0.4);
-    border: 2px solid rgba(255, 250, 250, 0.8);
-    border-radius: 20px;
-    padding: 15px;
+    border: 1px solid rgba(255, 250, 250, 0.8);
+    border-radius: 15px;
+    padding: 3.5px;
     width: 25%;
     text-align: center;
-    font-size: 1em;
+    font-size: .5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 a {
@@ -407,7 +403,7 @@ a {
 
 .nav-active {
     background-color: rgba(251, 219, 101, .4);
-    color: var(--highlight-text);
+    color: var(--highlight-text-dark);
 }
 
 
@@ -1563,7 +1559,7 @@ input[type="radio"] {
 .sdg-number {
     font-size: 1.5rem;
     font-weight: 800;
-    color: var(--accent-text);
+    color: var(--accent-text-light);
     margin-bottom: 0.25rem;
 }
 
@@ -2024,7 +2020,7 @@ footer {
     gap: 0.5rem;
     z-index: 999;
     flex-wrap: wrap;
-    max-width: 250px;
+    max-width: 250px; 
     justify-content: center;
 }
 
@@ -2090,7 +2086,7 @@ footer {
 }
 
 #locateBtn {
-    color: var(--accent-text);
+    color: var(--accent-text-light);
     box-shadow: 0 4px 12px rgba(255, 250, 250, 0.4);
 }
 /* Use the pseudo-element to safely inject the text into the font engine */
@@ -2104,10 +2100,11 @@ footer {
     bottom: -100%;
     left: 0;
     right: 0;
-    background: var(--surface);
-    border-top: 2px solid var(--primary);
-    border-radius: 16px 16px 0 0;
-    z-index: 950;
+    background-color: rgba(131, 117, 105, 0.4);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 250, 250, 0.6);
+    z-index: 200;
     max-height: 90vh;
     overflow-y: auto;
     transition: bottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
