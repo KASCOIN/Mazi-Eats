@@ -8,6 +8,8 @@
 const UNILAG_LAT = 6.6;
 const UNILAG_LNG = 3.4;
 const ZOOM_LEVEL = 16;
+const ZOOM_MIN = 14;
+const ZOOM_MAX = 18;
 
 // Unilag campus bounds — map cannot be panned outside
 const UNILAG_BOUNDS = L.latLngBounds(
@@ -225,42 +227,34 @@ function createTeardropPin(color, emoji) {
 // User avatar marker
 function createUserAvatar() {
     return L.divIcon({
-        className: '',
+        className: 'user-avatar-marker',
         html: `
             <div style="
                 position: relative;
-                width: 36px;
-                height: 36px;
+                width: 44px;
+                height: 44px;
+                z-index: 1000;
             ">
                 <div style="
-                    width: 36px;
-                    height: 36px;
+                    width: 40px;
+                    height: 40px;
                     background: linear-gradient(135deg, #1a6b3c, #2d9158);
                     border-radius: 50%;
-                    border: 3px solid #fff;
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+                    border: 4px solid #fff;
+                    box-shadow: 0 0 0 2px #1a6b3c, 0 4px 12px rgba(0, 0, 0, 0.3);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 18px;
+                    font-size: 20px;
+                    margin: 2px;
                 ">
                     🧑‍🎓
                 </div>
-                <div style="
-                    position: absolute;
-                    bottom: -4px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 8px;
-                    height: 8px;
-                    background: #1a6b3c;
-                    border-radius: 50%;
-                    border: 2px solid #fff;
-                "></div>
             </div>
         `,
-        iconSize: [36, 36],
-        iconAnchor: [18, 36]
+        iconSize: [44, 44],
+        iconAnchor: [22, 22],
+        popupAnchor: [0, -22]
     });
 }
 
@@ -284,6 +278,12 @@ let lastRerouteTime = 0;
 const REROUTE_INTERVAL_MS = 15000;
 const ARRIVAL_THRESHOLD_M = 20;
 
+// Location tracking options
+const LOCATION_OPTIONS = {
+    singleCheck: { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 },
+    continuous: { enableHighAccuracy: true, timeout: 5000, maximumAge: 3000 }  // 3 sec cache for continuous
+};
+
 // ═════════════════════════════════════════════════════════════════════════════
 // INITIALIZE MAP
 // ═════════════════════════════════════════════════════════════════════════════
@@ -295,26 +295,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initMap() {
-    // Create map with bounds restriction
+    // Create map with optimized performance for mobile
     map = L.map('map', {
         center: [UNILAG_LAT, UNILAG_LNG],
         zoom: ZOOM_LEVEL,
-        minZoom: 15,
-        maxZoom: 19,
-        maxBounds: UNILAG_BOUNDS,
-        maxBoundsViscosity: 1.0,
+        minZoom: ZOOM_MIN,
+        maxZoom: ZOOM_MAX,
         zoomControl: false,
         tap: false,
         tapTolerance: 15,
         touchZoom: true,
         bounceAtZoomLimits: false,
         inertia: true,
-        inertiaDeceleration: 3000,
-        inertiaMaxSpeed: 1500,
-        easeLinearity: 0.25,
-        zoomAnimation: true,
+        inertiaDeceleration: 2800,
+        inertiaMaxSpeed: 12000,
+        easeLinearity: 0.2,
+        zoomAnimation: false,  // Disable zoom animation for better mobile performance
         zoomAnimationThreshold: 4,
-        wheelPxPerZoomLevel: 80
+        wheelPxPerZoomLevel: 100,
+        attributionControl: false,  // Remove attribution to save space on mobile
+        preferCanvas: true  // Use canvas rendering for better performance
     });
 
     // OpenStreetMap tile layer
@@ -418,9 +418,16 @@ function setupEventListeners() {
     // Locate me
     document.getElementById('locateBtn').addEventListener('click', locateUser);
     
-    // Zoom buttons
-    document.getElementById('zoomInBtn').addEventListener('click', () => map.zoomIn());
-    document.getElementById('zoomOutBtn').addEventListener('click', () => map.zoomOut());
+    // Zoom buttons with debouncing for performance
+    let zoomTimeout = null;
+    const debounceZoom = (direction) => {
+        if (zoomTimeout) return;
+        if (direction === 'in') map.zoomIn();
+        else map.zoomOut();
+        zoomTimeout = setTimeout(() => { zoomTimeout = null; }, 200);
+    };
+    document.getElementById('zoomInBtn').addEventListener('click', () => debounceZoom('in'));
+    document.getElementById('zoomOutBtn').addEventListener('click', () => debounceZoom('out'));
     
     // Center map
     document.getElementById('centerBtn').addEventListener('click', () => {
@@ -538,37 +545,203 @@ function applyFilters() {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
+// LOCATION TRACKING METHODS
+// ═════════════════════════════════════════════════════════════════════════════
+
+/**
+ * METHOD 1: Single Ad-Hoc Check (High Accuracy, One-Time)
+ * Best for: Initial "Locate me" button — quick, precise location discovery
+ * Waits for GPS lock with desired accuracy threshold + smoothing
+ */
+function getSingleLocation(successCallback, errorCallback) {
+    if (!navigator.geolocation) {
+        errorCallback({ message: 'Geolocation not supported' });
+        return;
+    }
+    
+    const BEST_ACCURACY_TARGET = 20;     // Aim for <20m accuracy (like Google Maps)
+    const ACCEPTABLE_ACCURACY = 30;     // Accept anything <30m
+    const MAX_WAIT_TIME = 60000;        // Wait up to 60 seconds for best fix
+    const SMOOTHING_SAMPLES = 5;        // Average 5 readings for stability
+    const startTime = Date.now();
+    let readings = [];
+    let bestCoords = null;
+    
+    function averageReadings(samples) {
+        if (samples.length === 0) return null;
+        const avgLat = samples.reduce((sum, r) => sum + r.lat, 0) / samples.length;
+        const avgLng = samples.reduce((sum, r) => sum + r.lng, 0) / samples.length;
+        const avgAccuracy = samples.reduce((sum, r) => sum + r.accuracy, 0) / samples.length;
+        return { lat: avgLat, lng: avgLng, accuracy: avgAccuracy };
+    }
+    
+    function tryGetLocation() {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const coords = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                    accuracy: position.coords.accuracy,
+                    timestamp: new Date()
+                };
+                
+                readings.push(coords);
+                console.log(`📍 GPS Fix #${readings.length} - Accuracy: ${Math.round(coords.accuracy)}m`);
+                bestCoords = coords;
+                
+                // If we have collected enough samples, average them for stability
+                if (readings.length >= SMOOTHING_SAMPLES) {
+                    const smoothed = averageReadings(readings);
+                    console.log(`✅ Smoothed ${SMOOTHING_SAMPLES} readings: Accuracy ${Math.round(smoothed.accuracy)}m`);
+                    successCallback(smoothed);
+                    return;
+                }
+                
+                // If we got excellent accuracy on first try, return early
+                if (coords.accuracy < ACCEPTABLE_ACCURACY && readings.length === 1) {
+                    console.log('⚡ Excellent accuracy on first try!');
+                    successCallback(coords);
+                    return;
+                }
+                
+                // Keep collecting readings until time runs out
+                if (Date.now() - startTime < MAX_WAIT_TIME) {
+                    console.log(`⏳ Collecting readings for accuracy: ${Math.round(coords.accuracy)}m / ${BEST_ACCURACY_TARGET}m target...`);
+                    setTimeout(tryGetLocation, 1500);  // Try again in 1.5 seconds
+                } else {
+                    // Time exceeded, use best available
+                    if (readings.length >= 2) {
+                        const smoothed = averageReadings(readings);
+                        console.log(`⚠️ GPS timeout - using averaged ${readings.length} readings: ${Math.round(smoothed.accuracy)}m`);
+                        successCallback(smoothed);
+                    } else {
+                        console.log('⚠️ GPS timeout - using best single fix');
+                        successCallback(bestCoords);
+                    }
+                }
+            },
+            (error) => {
+                console.error('GPS error:', error);
+                // Don't give up immediately on error, retry
+                if (Date.now() - startTime < MAX_WAIT_TIME) {
+                    console.log('🔄 GPS error, retrying...');
+                    setTimeout(tryGetLocation, 1500);
+                } else {
+                    errorCallback(error);
+                }
+            },
+            LOCATION_OPTIONS.singleCheck
+        );
+    }
+    
+    tryGetLocation();
+}
+
+/**
+ * METHOD 2: Continuous Real-Time Tracking (High Accuracy, Streaming)
+ * Best for: Active navigation — live updates as user moves
+ * Updates every 3 seconds with network error recovery
+ */
+let trackingRetryCount = 0;
+const MAX_TRACKING_RETRIES = 3;
+
+function startContinuousTracking(updateCallback, errorCallback) {
+    if (!navigator.geolocation) {
+        errorCallback({ message: 'Geolocation not supported' });
+        return null;
+    }
+    
+    trackingRetryCount = 0;
+    
+    watchId = navigator.geolocation.watchPosition(
+        (position) => {
+            trackingRetryCount = 0;  // Reset retry counter on success
+            const coords = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                speed: position.coords.speed,
+                heading: position.coords.heading,
+                timestamp: new Date()
+            };
+            console.log(`🔄 Location update: ${Math.round(coords.accuracy)}m accuracy`);
+            updateCallback(coords);
+        },
+        (error) => {
+            trackingRetryCount++;
+            console.error(`❌ Tracking error (attempt ${trackingRetryCount}):`, error.message);
+            
+            // If network error, try to recover
+            if (error.code === error.TIMEOUT || error.code === error.POSITION_UNAVAILABLE) {
+                if (trackingRetryCount < MAX_TRACKING_RETRIES) {
+                    console.log(`🔄 Retrying tracking... (${trackingRetryCount}/${MAX_TRACKING_RETRIES})`);
+                    // Continue watching, will retry automatically
+                    return;
+                }
+            }
+            
+            // If max retries exceeded, notify user but keep trying
+            errorCallback(error);
+        },
+        LOCATION_OPTIONS.continuous
+    );
+    
+    return watchId;
+}
+
+/**
+ * Stop continuous tracking and save battery
+ */
+function stopContinuousTracking() {
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ═════════════════════════════════════════════════════════════════════════════
 // USER LOCATION & NAVIGATION
 // ═════════════════════════════════════════════════════════════════════════════
 
 function locateUser() {
-    if (!navigator.geolocation) {
-        showToast('Geolocation not supported', 'error');
-        return;
-    }
-    
-    const btn = document.getElementById('locateBtn');
     const icon = document.getElementById('locateIcon');
     
-    navigator.geolocation.getCurrentPosition(
-        (pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            userLatLng = { lat, lng };
+    // Show that we're waiting for GPS
+    showToast('📡 Searching for GPS signal...', 'info');
+    icon.innerHTML = 'settings';  // Loading spinner icon
+    
+    getSingleLocation(
+        (coords) => {
+            console.log('✅ Location received:', coords);
+            userLatLng = { lat: coords.lat, lng: coords.lng };
             
-            // Create avatar marker (silently, no popup, no address)
+            // Create/update user avatar marker
             if (userMarker) map.removeLayer(userMarker);
-            userMarker = L.marker([lat, lng], { icon: createUserAvatar() }).addTo(map);
+            userMarker = L.marker([coords.lat, coords.lng], { icon: createUserAvatar() }).addTo(map);
             
-            // Pan to user, don't zoom
-            map.panTo([lat, lng]);
+            // Zoom to user location
+            map.setView([coords.lat, coords.lng], 17);
+            
+            // Add accuracy circle visualization (optional)
+            L.circle([coords.lat, coords.lng], {
+                radius: coords.accuracy,
+                color: '#1a6b3c',
+                weight: 2,
+                opacity: 0.2,
+                fill: true,
+                fillColor: '#1a6b3c',
+                fillOpacity: 0.05
+            }).addTo(map);
             
             icon.innerHTML = 'my_location';
-            showToast('Location found', 'success');
+            showToast(`📍 Lat: ${coords.lat.toFixed(5)}, Lng: ${coords.lng.toFixed(5)} (±${Math.round(coords.accuracy)}m)`, 'success');
         },
-        () => {
+        (error) => {
+            console.error('❌ Location error:', error);
             icon.innerHTML = 'location_disabled';
-            showToast('Unable to get location', 'error');
+            showToast('Error: ' + error.message, 'error');
         }
     );
 }
@@ -581,16 +754,20 @@ function getDirections(lat, lng, name) {
     
     trackingDestination = { lat, lng, name };
     isTracking = true;
+    trackingErrorCount = 0;  // Reset error counter
     
     // Show navigation banner
     const banner = document.getElementById('navBanner');
     banner.classList.add('show');
     
-    // Start live tracking
-    watchId = navigator.geolocation.watchPosition(
-        (pos) => updateTracking(pos),
-        null,
-        { enableHighAccuracy: true, maximumAge: 5000 }
+    // Start continuous real-time tracking (METHOD 2)
+    startContinuousTracking(
+        (coords) => {
+            updateTracking(coords);
+        },
+        (error) => {
+            handleTrackingError(error);
+        }
     );
     
     // Setup routing
@@ -613,16 +790,25 @@ function getDirections(lat, lng, name) {
     closePlaceCard();
 }
 
-function updateTracking(pos) {
-    userLatLng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+let lastKnownPosition = null;  // Fallback position if tracking fails
+let trackingErrorCount = 0;
+
+let lastUpdateTime = 0;
+const UPDATE_THROTTLE = 1000;  // Update UI every 1 second to reduce repaints
+
+function updateTracking(coords) {
+    lastKnownPosition = { lat: coords.lat, lng: coords.lng };  // Store fallback
+    userLatLng = { lat: coords.lat, lng: coords.lng };
+    trackingErrorCount = 0;  // Reset error counter on successful update
     
+    // Update marker immediately (smooth movement)
     if (userMarker) {
-        userMarker.setLatLng([userLatLng.lat, userLatLng.lng]);
+        userMarker.setLatLng([coords.lat, coords.lng]);
     }
     
     if (trackingDestination) {
         const distance = map.distance(
-            [userLatLng.lat, userLatLng.lng],
+            [coords.lat, coords.lng],
             [trackingDestination.lat, trackingDestination.lng]
         );
         
@@ -633,11 +819,14 @@ function updateTracking(pos) {
             return;
         }
         
-        // Update banner (no address, just destination + distance + ETA)
-        const mins = Math.ceil(distance / 1.4 / 60);  // ~1.4 m/s walking speed
-        const banner = document.getElementById('navBanner');
-        document.getElementById('navDestination').textContent = `🟢 Navigating to ${trackingDestination.name}`;
-        document.getElementById('navDetails').textContent = `${Math.round(distance)}m away · ~${mins} min walk`;
+        // Throttle banner updates to reduce repaints (every 1 second)
+        const now = Date.now();
+        if (now - lastUpdateTime > UPDATE_THROTTLE) {
+            lastUpdateTime = now;
+            const mins = Math.ceil(distance / 1.4 / 60);  // ~1.4 m/s walking speed
+            document.getElementById('navDestination').textContent = `🟢 Navigating to ${trackingDestination.name}`;
+            document.getElementById('navDetails').textContent = `${Math.round(distance)}m away · ~${mins} min walk · Accuracy: ±${Math.round(coords.accuracy)}m`;
+        }
         
         // Reroute occasionally
         if (Date.now() - lastRerouteTime > REROUTE_INTERVAL_MS) {
@@ -647,12 +836,28 @@ function updateTracking(pos) {
     }
 }
 
+function handleTrackingError(error) {
+    trackingErrorCount++;
+    console.error(`⚠️ Navigation error #${trackingErrorCount}:`, error.message);
+    
+    // Use last known position as fallback if available
+    if (lastKnownPosition) {
+        console.log('🔄 Using last known position as fallback...');
+        // Keep showing last known position
+        if (userMarker) {
+            userMarker.setLatLng([lastKnownPosition.lat, lastKnownPosition.lng]);
+        }
+    }
+    
+    // Show error if too many consecutive failures
+    if (trackingErrorCount >= 3) {
+        showToast('⚠️ Network issue - using last position', 'warning');
+    }
+}
+
 function stopNavigation() {
     isTracking = false;
-    if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-    }
+    stopContinuousTracking();  // Uses METHOD 2 cleanup
     if (routingControl) {
         map.removeControl(routingControl);
         routingControl = null;
@@ -663,6 +868,14 @@ function stopNavigation() {
 
 document.getElementById('navStopBtn').onclick = stopNavigation;
 
+// Safety check for all DOM elements before attaching listeners
+document.addEventListener('DOMContentLoaded', () => {
+    const navStopBtn = document.getElementById('navStopBtn');
+    if (navStopBtn) {
+        navStopBtn.onclick = stopNavigation;
+    }
+});
+
 function shareLocation(lat, lng, name) {
     const text = `Check out ${name} on Unilag Campus! lat: ${lat}, lng: ${lng}`;
     if (navigator.share) {
@@ -670,6 +883,47 @@ function shareLocation(lat, lng, name) {
     } else {
         const url = `https://maps.google.com/?q=${lat},${lng}`;
         prompt('Share this location:', url);
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// MANUAL LOCATION INPUT (DEBUG/TESTING)
+// ═════════════════════════════════════════════════════════════════════════════
+
+function setManualLocation() {
+    const lat = prompt('Enter latitude:');
+    const lng = prompt('Enter longitude:');
+    
+    if (lat && lng) {
+        const coords = {
+            lat: parseFloat(lat),
+            lng: parseFloat(lng),
+            accuracy: 5,
+            timestamp: new Date()
+        };
+        
+        console.log('🎯 Manual location set:', coords);
+        userLatLng = { lat: coords.lat, lng: coords.lng };
+        
+        // Create/update user avatar marker
+        if (userMarker) map.removeLayer(userMarker);
+        userMarker = L.marker([coords.lat, coords.lng], { icon: createUserAvatar() }).addTo(map);
+        
+        // Zoom to location
+        map.setView([coords.lat, coords.lng], 17);
+        
+        // Add accuracy circle
+        L.circle([coords.lat, coords.lng], {
+            radius: coords.accuracy,
+            color: '#1a6b3c',
+            weight: 2,
+            opacity: 0.2,
+            fill: true,
+            fillColor: '#1a6b3c',
+            fillOpacity: 0.05
+        }).addTo(map);
+        
+        showToast(`📍 Manual location set: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`, 'success');
     }
 }
 
