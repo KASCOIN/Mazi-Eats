@@ -2100,11 +2100,18 @@ footer {
     bottom: -100%;
     left: 0;
     right: 0;
+<<<<<<< HEAD
     background-color: rgba(131, 117, 105, 0.4);
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(255, 250, 250, 0.6);
     z-index: 200;
+=======
+    background: white;
+    border-top: 2px solid var(--primary);
+    border-radius: 16px 16px 0 0;
+    z-index: 950;
+>>>>>>> 4dabe19 (Manifest file changes)
     max-height: 90vh;
     overflow-y: auto;
     transition: bottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
