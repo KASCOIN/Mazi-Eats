@@ -270,7 +270,7 @@ img, picture, video {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    height: 30vh;
+    height: 40vh;
     padding: 10px;
     gap: 5px;
 }
@@ -281,7 +281,57 @@ img, picture, video {
     border: 1px solid var(--border-dark);
     border-radius: 15px;
     width: 100%;
+    height: 100%;
     overflow: hidden;
+}
+
+/* Home Map Container */
+.home-map-container {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #e6f0ff;
+}
+
+.home-map-container .leaflet-container {
+    border-radius: 15px;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Leaflet popup content styling */
+.leaflet-popup-content {
+    margin: 8px;
+    font-family: var(--font-body);
+}
+
+.leaflet-popup {
+    border-radius: 8px;
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Desktop map enhancements */
+@media (min-width: 768px) {
+    .map-card {
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .home-map-container {
+        border-radius: 20px;
+    }
+
+    .map-card:hover .home-map-container {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
 }
 
 .openmap-btn {
@@ -296,6 +346,17 @@ img, picture, video {
     border: 1px solid var(--border-light);
     border-radius: 12px;
     backdrop-filter: blur(10px);
+    z-index: 10;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease-out;
+}
+
+.openmap-btn:hover {
+    background-color: rgba(251, 219, 101, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
 }
 
 
@@ -2394,6 +2455,316 @@ footer {
     }
 }
 
+
+/* ===== DESKTOP/TABLET LAYOUT (768px and above) ===== */
+@media (min-width: 768px) {
+    /* Layout Optimizations */
+    main {
+        padding-top: 8%;
+        max-width: 100%;
+    }
+
+    .container {
+        padding: 0 clamp(2rem, 5vw, 4rem);
+    }
+
+    /* Header Enhancement */
+    .header {
+        padding: 15px 2rem;
+    }
+
+    .logo {
+        padding: 8px 16px;
+        font-size: 1.2em;
+        margin-left: 1.5%;
+    }
+
+    .user-profile {
+        margin-right: 1.5%;
+    }
+
+    /* Hero/Top Row Section */
+    .top-row {
+        height: 35vh;
+        gap: 12px;
+        padding: 1rem 1.5rem;
+    }
+
+    .map-card {
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .home-map-container {
+        border-radius: 20px;
+    }
+
+    .map-card:hover .home-map-container {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .openmap-btn {
+        padding: 8px 16px;
+        font-size: 1em;
+        border-radius: 15px;
+        bottom: 15px;
+        right: 15px;
+    }
+
+    /* Highlights Section - Grid Layout */
+    .highlights {
+        padding: 2rem 1.5rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.5rem;
+        overflow-x: visible;
+        overflow-y: visible;
+        scroll-snap-type: none;
+    }
+
+    /* Card Sizing */
+    .hcard {
+        flex: none;
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hcard:nth-child(1),
+    .hcard:nth-child(2),
+    .hcard:nth-child(3),
+    .hcard:nth-child(4),
+    .hcard:nth-child(5),
+    .hcard:nth-child(6) {
+        flex: none;
+    }
+
+    .hcard:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transform: translateY(-4px);
+    }
+
+    .h-img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+    }
+
+    .hdetails {
+        height: auto;
+        padding: 12px;
+    }
+
+    .hname {
+        font-size: 1.1em;
+        padding: 8px;
+    }
+
+    /* Navigation Pill Enhancement */
+    nav {
+        bottom: 2%;
+        width: auto;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .nav-pill {
+        width: auto;
+        padding: 10px;
+        gap: 5px;
+        background-color: rgba(131, 117, 105, 0.5);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .routes {
+        padding: 8px 16px;
+        width: auto;
+        font-size: 0.75em;
+        border-radius: 18px;
+        gap: 4px;
+    }
+
+    .routes span {
+        display: none;
+    }
+
+    /* Cards Section */
+    .card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2.5rem;
+    }
+
+    /* Forms */
+    .form-group {
+        margin-bottom: 2rem;
+    }
+
+    .checkbox-group,
+    .radio-group {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+        min-height: 48px;
+    }
+
+    .hero-buttons {
+        gap: 1.5rem;
+    }
+}
+
+/* ===== LARGE DESKTOP LAYOUT (1024px and above) ===== */
+@media (min-width: 1024px) {
+    /* Ultra Wide Optimization */
+    main {
+        padding-top: 7%;
+    }
+
+    .container {
+        max-width: 1400px;
+        padding: 0 clamp(2rem, 6vw, 5rem);
+    }
+
+    .header {
+        padding: 18px clamp(2rem, 6vw, 5rem);
+    }
+
+    .logo {
+        font-size: 1.3em;
+    }
+
+    .top-row {
+        height: 40vh;
+        gap: 15px;
+        padding: 1.5rem 2rem;
+    }
+
+    .map-card {
+        border-radius: 25px;
+    }
+
+    /* Multi-Column Highlights */
+    .highlights {
+        padding: 2.5rem 2rem;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+
+    .h-img {
+        height: 180px;
+    }
+
+    .hdetails {
+        padding: 16px;
+    }
+
+    .hname {
+        font-size: 1.15em;
+        padding: 10px;
+    }
+
+    /* Features Section */
+    .features {
+        padding: clamp(4rem, 8vw, 8rem) 0;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3rem;
+    }
+
+    /* Navigation */
+    nav {
+        bottom: 2.5%;
+    }
+
+    .nav-pill {
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .routes {
+        padding: 10px 20px;
+        font-size: 0.85em;
+    }
+
+    /* Typography Refinement */
+    h1 { font-size: clamp(3rem, 5.5vw, 4.5rem); }
+    h2 { font-size: clamp(2rem, 4.5vw, 3.5rem); }
+    h3 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); }
+    h4 { font-size: clamp(1.1rem, 2.5vw, 1.5rem); }
+
+    p {
+        font-size: clamp(1rem, 2vw, 1.1rem);
+    }
+
+    /* Section Spacing */
+    section {
+        padding: 3rem 0;
+    }
+}
+
+/* ===== EXTRA LARGE DESKTOP (1440px and above) ===== */
+@media (min-width: 1440px) {
+    main {
+        padding-top: 6.5%;
+    }
+
+    .container {
+        max-width: 1600px;
+    }
+
+    .header {
+        padding: 20px clamp(2rem, 8vw, 6rem);
+    }
+
+    .top-row {
+        height: 45vh;
+        padding: 2rem 2.5rem;
+    }
+
+    .highlights {
+        padding: 3rem 2.5rem;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2.5rem;
+    }
+
+    .h-img {
+        height: 200px;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 3.5rem;
+    }
+
+    .logo {
+        font-size: 1.4em;
+        padding: 10px 20px;
+    }
+
+    .user-profile {
+        width: 50px;
+        height: 50px;
+    }
+
+    .material-symbols-rounded {
+        font-size: 28px;
+    }
+
+    /* Professional Spacing */
+    section {
+        padding: 4rem 0;
+    }
+
+    .hname {
+        font-size: 1.2em;
+    }
+}
 
 /* ===== MATERIAL SYMBOLS ROUNDED ICONS ===== */
 .material-symbols-rounded {

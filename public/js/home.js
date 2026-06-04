@@ -26,7 +26,7 @@ targetPoint.addEventListener('scroll', (e) => {
     }
 
     // Debugging readouts
-    console.log(`Ratio: ${scrollRatio.toFixed(2)} | Target Card Width: ${dynamicPercent.toFixed(1)}%`);
+    //console.log(`Ratio: ${scrollRatio.toFixed(2)} | Target Card Width: ${dynamicPercent.toFixed(1)}%`);
 });
 
 console.log('Home JS loaded');
