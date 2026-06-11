@@ -356,12 +356,8 @@ function openPlaceCard(vendor) {
     document.getElementById('sheetImage').src = vendor.image;
     document.getElementById('sheetVendorName').textContent = vendor.emoji + ' ' + vendor.name;
     
-    // Star rating
-    const stars = '★'.repeat(Math.floor(vendor.rating)) + '☆'.repeat(5 - Math.floor(vendor.rating));
-    document.getElementById('sheetRating').innerHTML = `
-        <span class="star">${stars}</span>
-        ${vendor.rating} · ${vendor.reviews} reviews
-    `;
+    // Rating (text only, no stars)
+    document.getElementById('sheetRating').textContent = `${vendor.rating} · ${vendor.reviews} reviews`;
     
     document.getElementById('sheetCategory').textContent = categoryColors[vendor.category].label;
     document.getElementById('sheetLocation').textContent = vendor.location;
@@ -369,13 +365,10 @@ function openPlaceCard(vendor) {
     document.getElementById('sheetPrice').textContent = vendor.price;
     document.getElementById('sheetDescription').textContent = vendor.description;
     
-    // Open sheet (peek state on mobile, full on desktop)
+    // Open sheet (peek state)
     const sheet = document.getElementById('bottomSheet');
     sheet.classList.add('open-peek');
-    if (window.innerWidth >= 1024) {
-        sheet.classList.add('open-full');
-        sheet.classList.remove('open-peek');
-    }
+    document.body.classList.add('sheet-open');
     
     // Setup action buttons
     document.getElementById('directionsBtn').onclick = () => {
@@ -385,11 +378,18 @@ function openPlaceCard(vendor) {
     document.getElementById('shareBtn').onclick = () => {
         shareLocation(vendor.lat, vendor.lng, vendor.name);
     };
+    
+    // Cancel / close button
+    const cancelBtn = document.getElementById('sheetCancelBtn');
+    if (cancelBtn) cancelBtn.onclick = closePlaceCard;
 }
 
 function closePlaceCard() {
     const sheet = document.getElementById('bottomSheet');
     sheet.classList.remove('open-peek', 'open-full');
+    // reset any transform used during dragging
+    sheet.style.transform = '';
+    document.body.classList.remove('sheet-open');
     currentVendor = null;
 }
 
@@ -400,10 +400,12 @@ function closePlaceCard() {
 function setupEventListeners() {
     // Search
     const searchInput = document.getElementById('mapSearch');
-    searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        performSearch(query);
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            performSearch(query);
+        });
+    }
     
     // Filters
     document.querySelectorAll('.filter-pill').forEach(btn => {
@@ -416,7 +418,8 @@ function setupEventListeners() {
     });
     
     // Locate me
-    document.getElementById('locateBtn').addEventListener('click', locateUser);
+    const locateBtn = document.getElementById('locateBtn');
+    if (locateBtn) locateBtn.addEventListener('click', locateUser);
     
     // Zoom buttons with debouncing for performance
     let zoomTimeout = null;
@@ -426,29 +429,31 @@ function setupEventListeners() {
         else map.zoomOut();
         zoomTimeout = setTimeout(() => { zoomTimeout = null; }, 200);
     };
-    document.getElementById('zoomInBtn').addEventListener('click', () => debounceZoom('in'));
-    document.getElementById('zoomOutBtn').addEventListener('click', () => debounceZoom('out'));
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    if (zoomInBtn) zoomInBtn.addEventListener('click', () => debounceZoom('in'));
+    if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => debounceZoom('out'));
     
     // Center map
-    document.getElementById('centerBtn').addEventListener('click', () => {
+    const centerBtn = document.getElementById('centerBtn');
+    if (centerBtn) centerBtn.addEventListener('click', () => {
         map.setView([UNILAG_LAT, UNILAG_LNG], ZOOM_LEVEL);
         // Close place card when centering map
         closePlaceCard();
     });
     
-    // Close sheet on background click
-    document.getElementById('map').addEventListener('click', (e) => {
-        if (e.target.id === 'map') {
-            closePlaceCard();
-        }
-    });
-    
-    // Close search results when clicking on map
-    document.getElementById('map').addEventListener('click', (e) => {
-        if (e.target.id === 'map') {
-            document.getElementById('searchResults').classList.remove('show');
-        }
-    });
+    // Close sheet and search results on background click
+    const mapEl = document.getElementById('map');
+    if (mapEl) {
+        mapEl.addEventListener('click', (e) => {
+            if (e.target.id === 'map') {
+                closePlaceCard();
+                const sr = document.getElementById('searchResults');
+                if (sr) sr.classList.remove('show');
+                document.body.classList.remove('search-active');
+            }
+        });
+    }
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -458,32 +463,95 @@ function setupEventListeners() {
 function setupBottomSheetDrag() {
     const sheet = document.getElementById('bottomSheet');
     const handle = document.querySelector('.sheet-handle');
-    let touchStart = 0;
-    let sheetHeight = 0;
-    
-    if (!handle) return;
-    
-    handle.addEventListener('touchstart', (e) => {
-        touchStart = e.touches[0].clientY;
-        sheetHeight = sheet.offsetHeight;
-    });
-    
-    handle.addEventListener('touchmove', (e) => {
-        if (!sheet.classList.contains('open-peek')) return;
-        
-        const touchCurrent = e.touches[0].clientY;
-        const diff = touchStart - touchCurrent;
-        
-        // Allow expanding sheet by dragging up
-        if (diff > 50) {
-            sheet.classList.remove('open-peek');
-            sheet.classList.add('open-full');
+    if (!handle || !sheet) return;
+
+    let startY = 0;
+    let currentY = 0;
+    let dragging = false;
+    const THRESHOLD_CLOSE = 120; // px to trigger close from peek
+    const THRESHOLD_COLLAPSE = 80; // px to collapse from full -> peek
+
+    function startDrag(y) {
+        startY = y;
+        currentY = y;
+        dragging = true;
+        sheet.style.transition = 'none';
+    }
+
+    function moveDrag(y) {
+        if (!dragging) return;
+        currentY = y;
+        const delta = currentY - startY; // positive when dragging down
+        sheet.style.transform = `translateY(${Math.max(0, delta)}px)`;
+    }
+
+    function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        sheet.style.transition = '';
+        const delta = currentY - startY;
+
+        // If sheet is open-full and user drags down a bit, collapse to peek
+        if (sheet.classList.contains('open-full')) {
+            if (delta > THRESHOLD_COLLAPSE) {
+                sheet.classList.remove('open-full');
+                sheet.classList.add('open-peek');
+            }
+            sheet.style.transform = '';
+            return;
         }
-    });
-    
-    handle.addEventListener('touchend', () => {
-        // Just toggle between states
-    });
+
+        // If sheet is in peek state and user drags down enough -> close
+        if (sheet.classList.contains('open-peek')) {
+            if (delta > THRESHOLD_CLOSE) {
+                closePlaceCard();
+                return;
+            }
+            // If user dragged up significantly, open full
+            if (delta < -50) {
+                sheet.classList.remove('open-peek');
+                sheet.classList.add('open-full');
+                sheet.style.transform = '';
+                return;
+            }
+        }
+
+        // Reset position
+        sheet.style.transform = '';
+    }
+
+    // Unified Pointer Events for reliable cross-device support
+    function pointerDownHandler(e) {
+        // Only start drag if touch/mouse is on handle or near top of sheet
+        const rect = sheet.getBoundingClientRect();
+        const y = e.clientY;
+        const onHandle = e.target === handle || handle.contains(e.target);
+        const nearTop = (y - rect.top) < 120;
+        if (!onHandle && !nearTop) return;
+
+        e.preventDefault();
+        startDrag(y);
+        // capture pointer for handle to continue receiving events
+        if (e.target.setPointerCapture) {
+            try { e.target.setPointerCapture(e.pointerId); } catch (err) {}
+        }
+
+        function onPointerMove(ev) { moveDrag(ev.clientY); }
+        function onPointerUp(ev) {
+            endDrag();
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+            if (ev.target && ev.target.releasePointerCapture) {
+                try { ev.target.releasePointerCapture(ev.pointerId); } catch (err) {}
+            }
+        }
+
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+    }
+
+    handle.addEventListener('pointerdown', pointerDownHandler);
+    sheet.addEventListener('pointerdown', pointerDownHandler);
 }
 
 function performSearch(query) {
@@ -501,6 +569,7 @@ function performSearch(query) {
     const resultsDiv = document.getElementById('searchResults');
     if (query.length === 0) {
         resultsDiv.classList.remove('show');
+        document.body.classList.remove('search-active');
         return;
     }
     
@@ -520,6 +589,7 @@ function performSearch(query) {
         window.searchResultsCache = results;
     }
     resultsDiv.classList.add('show');
+    document.body.classList.add('search-active');
 }
 
 function selectVendorFromSearch(idx) {
@@ -527,6 +597,7 @@ function selectVendorFromSearch(idx) {
         const vendor = window.searchResultsCache[idx];
         document.getElementById('mapSearch').value = '';
         document.getElementById('searchResults').classList.remove('show');
+        document.body.classList.remove('search-active');
         openPlaceCard(vendor);
         
         // Pan to vendor

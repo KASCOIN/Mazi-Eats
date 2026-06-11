@@ -17,9 +17,22 @@ const CORE_ASSETS = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_ASSETS))
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    try {
+      await cache.addAll(CORE_ASSETS);
+    } catch (err) {
+      // Fallback: try adding resources individually and log failures
+      console.error('Cache addAll failed, attempting individual cache adds', err);
+      for (const asset of CORE_ASSETS) {
+        try {
+          await cache.add(asset);
+        } catch (e) {
+          console.warn('Failed to cache', asset, e);
+        }
+      }
+    }
+  })());
   self.skipWaiting();
 });
 
