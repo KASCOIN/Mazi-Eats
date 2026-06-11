@@ -67,12 +67,19 @@ function displayMealSuggestions(meals) {
     container.innerHTML = '';
 
     meals.forEach((meal, index) => {
+        // Handle both string and object formats for ingredients
         const ingredientsList = (meal.ingredients_needed || [])
-            .map(ing => `<li>${ing}</li>`)
+            .map(ing => {
+                const text = typeof ing === 'string' ? ing : (ing.name || ing || '');
+                return `<li>${text}</li>`;
+            })
             .join('');
 
         const missingList = (meal.missing_ingredients_to_buy || [])
-            .map(ing => `<li>${ing}</li>`)
+            .map(ing => {
+                const text = typeof ing === 'string' ? ing : (ing.name || ing || '');
+                return `<li>${text}</li>`;
+            })
             .join('');
 
         const mealHTML = `
@@ -143,3 +150,62 @@ function setActiveNav() {
         }
     });
 }
+/* ===== Immersive pop-up behavior: open on final action (submit) ===== */
+let _immersiveCardRef = null;
+
+function openImmersiveCard(card) {
+    if (!card) return;
+    if (_immersiveCardRef) closeImmersiveCard();
+    _immersiveCardRef = card;
+    card.classList.add('immersive-card');
+    document.body.classList.add('immersive-active');
+
+    let btn = card.querySelector('.immersive-close-btn');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.className = 'immersive-close-btn';
+        btn.setAttribute('aria-label', 'Close');
+        btn.innerText = '✕';
+        btn.addEventListener('click', closeImmersiveCard);
+        card.appendChild(btn);
+    }
+}
+
+function closeImmersiveCard() {
+    if (!_immersiveCardRef) return;
+    _immersiveCardRef.classList.remove('immersive-card');
+    document.body.classList.remove('immersive-active');
+    const btn = _immersiveCardRef.querySelector('.immersive-close-btn');
+    if (btn) btn.remove();
+    _immersiveCardRef = null;
+
+    // if healthy form was hidden when opening results, restore it
+    const form = document.getElementById('healthyForm');
+    if (form && form.style.display === 'none') {
+        form.style.display = '';
+    }
+}
+
+// When results are displayed, open immersive popup for that card
+const _originalDisplayMealSuggestions = displayMealSuggestions;
+displayMealSuggestions = function(meals) {
+    _originalDisplayMealSuggestions(meals);
+    const resultsSection = document.getElementById('resultsSection');
+    const card = resultsSection ? resultsSection.closest('.card') : null;
+    // hide the input form so only results are visible in the popup
+    const form = document.getElementById('healthyForm');
+    if (form) form.style.display = 'none';
+    if (card) {
+        openImmersiveCard(card);
+    }
+
+    // ensure Try Again button also closes immersive
+    const tryBtn = resultsSection ? resultsSection.querySelector('.btn.btn-ghost') : null;
+    if (tryBtn) {
+        tryBtn.addEventListener('click', function() {
+            // restore the form and close popup
+            if (form) form.style.display = '';
+            closeImmersiveCard();
+        });
+    }
+};

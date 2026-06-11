@@ -14,7 +14,7 @@ export get_recipe, get_healthy_suggestions
 Generate a rich recipe by combining TheMealDB data with AI personalization, Nigerian pricing, and user preferences.
 """
 function get_recipe(base_food::String, style::String, servings::Int, proteins::Vector{String}, preferences::String="")
-    api_key = "AIzaSyCO5wPMv8Kgym1lw1qFIwWQyE7PGOU-Qnk"
+    api_key = "AQ.Ab8RN6ITxgWiXS3ixyM2bW3H-vi-kfurSYZ3uvVcoCdDsjiu0g"
     
     proteins_str = join(proteins, ", ")
     
@@ -122,7 +122,7 @@ end
 Call Gemini API to get healthy eating suggestions based on available ingredients and budget.
 """
 function get_healthy_suggestions(ingredients::String, budget::Int)
-    api_key = "AIzaSyCO5wPMv8Kgym1lw1qFIwWQyE7PGOU-Qnk"
+    api_key = "AQ.Ab8RN6ITxgWiXS3ixyM2bW3H-vi-kfurSYZ3uvVcoCdDsjiu0g"
     
     # Get real prices from database for reference
     all_prices = get_all_prices()
