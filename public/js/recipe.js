@@ -57,6 +57,8 @@ function setupRecipeBuilder() {
             }
         });
     });
+
+    
 }
 
 function updateStyleOptions() {
@@ -76,6 +78,8 @@ function updateStyleOptions() {
         `;
         styleOptionsContainer.appendChild(div);
     });
+
+    
 }
 
 function toggleIngredientMode(mode) {
@@ -226,7 +230,12 @@ function displayRecipe(recipe, baseFood, style, servings, proteins) {
     
     // Format ingredients
     const ingredientsList = (recipe.ingredients || [])
-        .map(ing => `<li class="ingredient-item"><span>${ing.name}</span> <span class="ingredient-quantity">${ing.quantity || 'as needed'} (₦${ing.estimated_naira_cost || 0})</span></li>`)
+        .map(ing => {
+            const name = typeof ing === 'string' ? ing : (ing.name || ing.item || '');
+            const quantity = (typeof ing === 'object') ? (ing.quantity || 'as needed') : 'as needed';
+            const cost = (typeof ing === 'object') ? (ing.estimated_naira_cost || 0) : 0;
+            return `<li class="ingredient-item"><span>${name}</span> <span class="ingredient-quantity">${quantity} (₦${cost})</span></li>`;
+        })
         .join('');
 
     // Format steps
@@ -336,3 +345,50 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+/* ===== Immersive pop-up: open recipe when generated ===== */
+let _recipeImmersiveRef = null;
+
+function openImmersiveCard(card) {
+    if (!card) return;
+    if (_recipeImmersiveRef) closeImmersiveCard();
+    _recipeImmersiveRef = card;
+    card.classList.add('immersive-card');
+    document.body.classList.add('immersive-active');
+
+    let btn = card.querySelector('.immersive-close-btn');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.className = 'immersive-close-btn';
+        btn.setAttribute('aria-label', 'Close');
+        btn.innerText = '✕';
+        btn.addEventListener('click', closeImmersiveCard);
+        card.appendChild(btn);
+    }
+}
+
+function closeImmersiveCard() {
+    if (_recipeImmersiveRef) {
+        _recipeImmersiveRef.classList.remove('immersive-card');
+        const btn = _recipeImmersiveRef.querySelector('.immersive-close-btn');
+        if (btn) btn.remove();
+        _recipeImmersiveRef = null;
+    }
+    document.body.classList.remove('immersive-active');
+}
+
+// After recipe is displayed, open popup
+const _originalDisplayRecipe = displayRecipe;
+displayRecipe = function(recipe, baseFood, style, servings, proteins) {
+    _originalDisplayRecipe(recipe, baseFood, style, servings, proteins);
+    const recipeOutput = document.getElementById('recipeOutput');
+    const card = recipeOutput ? recipeOutput.closest('.card') : null;
+    if (card) openImmersiveCard(card);
+};
+
+// Ensure reset closes immersive
+const _originalResetForm = resetForm;
+resetForm = function() {
+    _originalResetForm();
+    closeImmersiveCard();
+};
