@@ -4,28 +4,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipe Builder</title>
+    <title>Recipe Builder - MAZI-EATS</title>
     <meta name="theme-color" content="#1B5E20">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/img/pwa-icon-192.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20,400,0,0" />
 </head>
 <body class="chef-mode-page">
 
+    <!-- Top Row Header -->
+    <header class="header">
+        <div href="/" class="logo"><span class="first-name">MAZI-</span>EATS</div>
+    </header>
+
     <!-- Hero Section -->
-    <header class="hero" style="min-height: 40vh;">
+    <header class="hero" style="min-height: 46vh;">
         <div class="container hero-content">
             <h1>Recipe Builder</h1>
-            <p class="hero-subtitle">Create your perfect meal step by step with AI assistance</p>
+            <p class="hero-tagline">Build meals your way</p>
+            <p class="hero-subtitle">Choose a base, pick a style, and let MAZI-EATS help you create a recipe that fits your taste, ingredients, and schedule.</p>
+            <div class="hero-buttons">
+                <a href="#recipeForm" class="btn btn-primary">Start Building</a>
+                <a href="/" class="btn btn-secondary">Back to Home</a>
+            </div>
         </div>
     </header>
 
-    <!-- Recipe Builder Form -->
-    <main class="container" style="padding: clamp(2rem, 5vw, 4rem) 0;">
-        <div style="max-width: 800px; margin: 0 auto;">
+    <!-- Main Content -->
+    <main>
+        <section class="container" style="padding: clamp(2rem, 5vw, 4rem) 0; max-width: 960px; margin: 0 auto;">
+            <div style="margin-bottom: 2rem;">
+                <div class="features-title" style="margin-bottom: 1rem;">
+                    <h2 style="margin-bottom: 0.5rem;">Build a recipe in 5 steps</h2>
+                    <p style="color: var(--text-light); max-width: 48rem; margin: 0 auto;">A guided builder for students who want something practical, flexible, and fast.</p>
+                </div>
+            </div>
+
             <!-- Back Button (Mobile) -->
             <button class="back-button" id="backButton" onclick="history.back()" style="display: none;">
                 ← Back
@@ -36,7 +53,7 @@
                 <!-- Step 1: Base Food -->
                 <div class="card step-section" id="step-1-section">
                     <h3>Step 1: Pick a Base Food</h3>
-                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">Select what foundation you want for your meal</p>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">Select the foundation for your meal</p>
                     <div class="checkbox-group">
                         <div class="checkbox-item">
                             <input type="radio" id="base-rice" name="baseFood" value="Rice" required>
@@ -76,9 +93,7 @@
                 <div class="card step-section" id="step-2-section" style="display: none;">
                     <h3>Step 2: Pick a Style</h3>
                     <p style="color: var(--text-light); margin-bottom: 1.5rem;">How would you like to prepare your meal?</p>
-                    <div class="checkbox-group" id="styleOptions">
-                        <!-- Options will be populated dynamically -->
-                    </div>
+                    <div class="checkbox-group" id="styleOptions"></div>
                     <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
                         <button type="button" class="btn btn-ghost" onclick="goToStep(1)">← Back</button>
                         <button type="button" class="btn btn-primary" onclick="goToStep(3)">Next →</button>
@@ -102,8 +117,7 @@
                 <!-- Step 4: Ingredient Selection Mode + Proteins -->
                 <div class="card step-section" id="step-4-section" style="display: none;">
                     <h3>Step 4: Choose Your Ingredients</h3>
-                    
-                    <!-- Ingredient Mode Selection -->
+
                     <div style="margin-bottom: 2rem;">
                         <p style="color: var(--text-light); margin-bottom: 1rem;">How would you like to select ingredients?</p>
                         <div class="checkbox-group" style="margin-bottom: 1.5rem;">
@@ -118,7 +132,6 @@
                         </div>
                     </div>
 
-                    <!-- Suggested Proteins (Shown when mode = suggested) -->
                     <div id="suggestedProteinsSection">
                         <p style="color: var(--text-light); margin-bottom: 1rem;">Pick one or more proteins (optional)</p>
                         <div class="checkbox-group">
@@ -157,7 +170,6 @@
                         </div>
                     </div>
 
-                    <!-- Custom Ingredients (Hidden by default) -->
                     <div id="customIngredientsSection" style="display: none;">
                         <p style="color: var(--text-light); margin-bottom: 1rem;">Type the proteins/ingredients you want to include</p>
                         <div class="form-group">
@@ -201,13 +213,67 @@
                     </div>
                 </div>
             </form>
-        </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <div class="features-title">
+                    <h2>Why Build with MAZI-EATS?</h2>
+                </div>
+                <div class="card-grid">
+                    <div class="card feature-card">
+                        <div class="feature-icon">🧩</div>
+                        <h3>Flexible Builder</h3>
+                        <p>Mix and match bases, styles, proteins, and preferences to create a recipe that feels personal.</p>
+                    </div>
+                    <div class="card feature-card">
+                        <div class="feature-icon">⏱️</div>
+                        <h3>Fast Decisions</h3>
+                        <p>Use the guided steps to reduce guesswork and get to a finished recipe quickly.</p>
+                    </div>
+                    <div class="card feature-card">
+                        <div class="feature-icon">🥗</div>
+                        <h3>Student Friendly</h3>
+                        <p>Designed around practical ingredients, tight schedules, and everyday campus cooking.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>
 
-   
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col" style="width: 40%;">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/map" style="color: rgb(196, 196, 214);">Find Food</a></li>
+                        <li><a href="/healthy" style="color: rgb(196, 196, 214);">Budget Meals</a></li>
+                        <li><a href="/" style="color: rgb(196, 196, 214);">Home</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col" style="width: 40%;">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="mazimum.onrender.com" style="color: rgb(196, 196, 214);"><b>Portfolio</b></a></li>
+                        <li><a href="mailto:nwosukasie@gmail.com" style="color: rgb(196, 196, 214);"><b>Email</b></a></li>
+                    </ul>
+                </div>
+                <div class="footer-col footer-unique-width">
+                    <div>
+                        <p> Build meals that match your cravings, ingredients, and time. MAZI-EATS helps students turn simple ideas into practical recipes with less stress and more confidence.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 MAZAGRI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <!-- Floating Navigation Bar -->
     <nav>
@@ -233,8 +299,8 @@
             </span>    
         </div>
     </nav>
-    <script src="/js/navigation.js"></script>
 
+    <script src="/js/navigation.js"></script>
     <script src="/js/recipe.js"></script>
 </body>
 </html>
