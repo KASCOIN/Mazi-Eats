@@ -1,7 +1,7 @@
 {
   "name": "MAZI-EATS",
   "short_name": "MAZI-EATS",
-  "description": "Smart meal planning for University of Lagos students.",
+  "description": "Smart meal planning for University students.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -1980,10 +1980,11 @@ footer {
     left: 12px;
     right: 12px;
     max-height: 300px;
-    background: var(--surface);
+    background: #244e32;
+    color: var(--text-light);
     border: 2px solid var(--primary);
     border-top: none;
-    border-radius: 0 0 4px 4px;
+    border-radius: 0 0 10px 10px;
     overflow-y: auto;
     z-index: 999;
     display: none;
@@ -1992,6 +1993,29 @@ footer {
 
 .search-results.show {
     display: block;
+}
+
+/* Hide filter pills when search results are visible (they precede the pills in DOM) */
+.search-results.show ~ .filter-pills {
+    display: none !important;
+}
+
+/* Hide filter pills when a bottom sheet is open (body class toggled by JS) */
+body.sheet-open .filter-pills {
+    display: none !important;
+}
+
+@media (min-width: 1024px) {
+    /* Center search results and constrain to ~60% width on large screens */
+    .search-results {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 60%;
+        max-width: 1200px;
+        top: 84px;
+        border-radius: 8px;
+    }
 }
 
 .search-result-item {
@@ -2010,34 +2034,63 @@ footer {
 }
 
 .result-name {
-    color: var(--primary);
+    color: white;
     font-weight: 600;
     margin-bottom: 0.25rem;
     text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
 }
 
 .result-category {
-    color: var(--primary);
+    color: white;
     font-size: 0.85rem;
     opacity: 0.7;
 }
 
+
+
 /* ===== FILTER PILLS ===== */
+
+
+
 .filter-pills {
     position: fixed;
-    top: 7.5%;
-    right: 20px;
+    top: 9%;
     display: flex;
+    flex-direction: row;
     gap: 0.5rem;
     z-index: 999;
     flex-wrap: wrap;
-    max-width: 250px; 
+    max-width: 500px; 
     justify-content: center;
+    color: white;
+    right: calc((100% - 85%)/2 + 12px); /* align end with the search bar (search bar width = 85%) */
 }
+
+/* Hide or soften filter pills when search or sheet is active */
+.search-active .filter-pills,
+.sheet-open .filter-pills {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+    pointer-events: none;
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+@media (max-width: 480px) {
+    /* On small screens center the filter pills under the search control */
+    .filter-pills {
+       position: fixed;
+       left: 50%;
+       transform: translateX(-50%);
+       right: auto;
+       top: 86px;
+       color: white;
+    }
+}
+
 
 .filter-pill {
     padding: 0.5rem 1rem;
-    background-color: rgba(255, 250, 250, 0.4);
+    background-color: hsl(145, 42%, 80%);
     border: 2px solid rgba(255, 250, 250, 0.8);
     border-radius: 20px;
     cursor: pointer;
@@ -2054,8 +2107,8 @@ footer {
 }
 
 .filter-pill.active {
-    background-color: rgba(251, 219, 101, .4);
-    color: var(--active-text);
+    background-color: #1d4e2d;
+    color: #e8e1db;
 }
 
 /* ===== FLOATING ACTION BUTTONS ===== */
@@ -2073,7 +2126,7 @@ footer {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background-color: rgba(255, 250, 250, 0.4);
+    background-color: #146115;
     border: 1px solid rgba(255, 250, 250, 0.8);
     border-radius: 50%;
     cursor: pointer;
@@ -2122,8 +2175,12 @@ footer {
     border-top: 2px solid var(--primary);
     border-radius: 16px 16px 0 0;
     z-index: 950;
+<<<<<<< HEAD
 >>>>>>> 4dabe19 (Manifest file changes)
     max-height: 90vh;
+=======
+    max-height: 50vh;
+>>>>>>> 9a703434241a5765f3609e238de8e69ccac30036
     overflow-y: auto;
     transition: bottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
@@ -2134,22 +2191,55 @@ footer {
     max-height: 45vh;
 }
 
+/* Full-screen mobile sheet (kept for very small devices) */
 .bottom-sheet.open-full {
     bottom: 0;
     max-height: 90vh;
 }
 
+/* Desktop-specific floating sheet behavior was removed to keep uniform bottom-sheet UX.
+   The sheet remains a bottom modal across screen sizes, with drag-to-close and peek/full states. */
+
+/* Top cancel button (moved into header) */
+.sheet-header { position: relative; }
+.sheet-cancel-top {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 1.05rem;
+    cursor: pointer;
+    padding: 6px;
+}
+.sheet-cancel-top:active { transform: scale(0.98); }
+
 .sheet-handle {
     width: 40px;
-    height: 4px;
-    background: rgba(0, 255, 136, 0.4);
-    border-radius: 2px;
-    margin: 12px auto;
+    height: 24px; /* larger hit area for touch */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0px auto;
     cursor: grab;
+    touch-action: none; /* ensure touch events are captured */
 }
 
 .sheet-handle:active {
     cursor: grabbing;
+}
+
+.sheet-handle::before {
+    content: '';
+    width: 40px;
+    height: 4px;
+    background: rgba(0, 255, 136, 0.4);
+    border-radius: 2px;
+    display: block;
+}
+
+.bottom-sheet {
+    touch-action: none; /* prevent parent map from capturing gestures while interacting with sheet */
 }
 
 .sheet-image {
